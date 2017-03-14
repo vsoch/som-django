@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang='en'>
+<head>
+    <title>{% block title %}Wordfish: Image and Text Fish{% endblock %}</title>
+    {% block includes %}{% endblock %}
+    {% block global_includes %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css" />
+    <link href="//cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css" 
+          media="screen" rel="stylesheet" type="text/css" />
+    <link href="{% static "css/style.css"%}" media="screen" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static "css/toastr.min.css" %}" media="screen" type="text/css">
+
+    <!--Favicon-->
+    <link rel="apple-touch-icon" sizes="57x57" href="{% static "img/favicon/apple-icon-57x57.png"%}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{% static "img/favicon/apple-icon-60x60.png"%}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{% static "img/favicon/apple-icon-72x72.png"%}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static "img/favicon/apple-icon-76x76.png"%}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{% static "img/favicon/apple-icon-114x114.png"%}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{% static "img/favicon/apple-icon-120x120.png"%}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{% static "img/favicon/apple-icon-144x144.png"%}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{% static "img/favicon/apple-icon-152x152.png"%}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static "img/favicon/apple-icon-180x180.png"%}">
+    <link rel="icon" type="image/png" sizes="192x192"  href="{% static "img/favicon/android-icon-192x192.png"%}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static "img/favicon/favicon-32x32.png"%}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{% static "img/favicon/favicon-96x96.png"%}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static "img/favicon/favicon-16x16.png"%}">
+    <link rel="manifest" href="{% static "img/favicon/manifest.json"%}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{% static "img/faviconms-icon-144x144.png"%}">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Disable tap highlight on IE -->
+    <meta name="msapplication-tap-highlight" content="no">
+
+    {% block css %}{% endblock %}
+    {% endblock %}
+    {% block head %}{% endblock %}
+    {% block functions %}{% endblock %}
+</head>
+
+
+{% block body %}
+<body>
+
+{% include "base/header.html" %}
+
+<!--Main layout-->
+<div class="container-fluid" style='padding-left:150px;padding-right:150px'>
+    <div class="row" style='padding-top:50px'>
+
+            <!--Sidebar-->
+            {% if nosidebar %}
+               <div class="col-md-12" style="margin-top:20px">
+            {% else %}
+               {% include "base/sidebar.html" %}
+               <div class="col-md-9" style="margin-top:20px; padding:30px">
+            {% endif %}
+                {% block content %}{% endblock %}
+             </div>
+     </div>
+</div>
+
+    {% include "base/feedback.html" %}
+    <!-- JQuery -->
+    <!--<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>-->
+    <script type="text/javascript" src="{% static "js/jquery-2.2.3.min.js"%}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" ></script>
+    <script type="text/javascript" src="{% static "js/toastr.min.js"%}"></script>
+    <script type="text/javascript" src="{% static "js/functions.js"%}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+
+<script>
+$(document).ready(function(){
+   $('.dropdown-toggle').dropdown()
+
+   // If the user has snacks, alert to request a snack!
+   {% if request.user.is_authenticated %} 
+       {% if user.snackbox_set.all.0.earned_snack %}  
+
+       toastr.options = {
+          "closeButton": true,
+          "debug": false,
+          "newestOnTop": true,
+          "progressBar": true,
+          "positionClass": "toast-bottom-right",
+          "preventDuplicates": true,
+          "showDuration": "300",
+          "hideDuration": "1000",
+          "onclick": function(){ document.location = "{% url 'redeem_snacks' %}" }
+          "timeOut": "5000",
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+       }
+
+       toastr["info"]("You have earned at least 1000 points in your SnackBox, 
+                       and it's time to request a snack.", "You can request a snack!")
+       {% endif %}
+   {% endif %}
+})
+</script>
+    {% block scripts %}{% endblock %}
+
+</body>
+{% endblock %}
+</html>

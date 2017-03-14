@@ -1,0 +1,17 @@
+<div class="modal fade" id='feedback-modal'>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content"  style="width:800px;height:800px">
+      <div class="modal-body" id="feedback-body">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function showFeedback() {
+
+    $("#feedback-body").append('<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdYc33OnkMpAiOeQzfQ7XU-cq4VQLCzOxbvPGDlSDdxNKfeLQ/viewform?embedded=true" width="760" height="760" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>')
+    $('#feedback-modal').modal('show');
+
+    }
+</script>

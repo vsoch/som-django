@@ -1,0 +1,33 @@
+ 
+main {
+    padding-top: 3rem;
+    padding-bottom: 2rem;
+}
+
+.nav-tabs {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.widget-wrapper {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 2rem;
+}
+
+.extra-margins {
+    margin-top: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.divider-new {
+    margin-top: 0;
+}
+
+.container {
+    max-width: 1600px !important;
+}
+
+h3,h4,h5,h6 {
+  font-weight: 300 !important;
+}

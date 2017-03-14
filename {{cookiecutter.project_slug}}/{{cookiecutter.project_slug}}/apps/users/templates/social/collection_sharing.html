@@ -1,0 +1,78 @@
+{% if fieldtype == "image_annotation" %}
+{% with url="images/annotate" %}  
+<div class="btn-group">
+    <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share</i></button>
+         <div class="dropdown-menu">
+         <a class="dropdown-item" href="https://twitter.com/intent/tweet?text=Image Annotation on WordFish&url=/collections/{{ collection.id }}/{{ url }}" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i> Twitter</a>
+         <a class="dropdown-item" href="https://facebook.com/sharer.php?u=/collections/{{ collection.id }}/{{ url }} Image Annotation on WordFish" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+        <a class="dropdown-item"  href="http://www.reddit.com/submit?url=/collections/{{ collection.id }}/{{ url }}&title={{ collection.name }}  Image Annotation on WordFish" rel="nofollow" target="_blank" title="Share on Reddit"><i class="fa fa-reddit"></i> Reddit</a>
+        </div>
+</div>
+<a id="{{ fieldtype }}_link" href="{{ domain_name }}/collections/{{ collection.id }}/{{ url }}"><button class="btn btn-sm btn-primary">Annotate!</button></a>
+{% endwith %}
+{% endif %}
+{% if fieldtype == "image_markup" %}
+{% with url="images/markup" %}  
+<div class="btn-group">
+    <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share</i></button>
+         <div class="dropdown-menu">
+         <a class="dropdown-item" href="https://twitter.com/intent/tweet?text=Image Markup on WordFish&url=/collections/{{ collection.id }}/{{ url }}" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i> Twitter</a>
+         <a class="dropdown-item" href="https://facebook.com/sharer.php?u=/collections/{{ collection.id }}/{{ url }} Image Markup on WordFish" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+        <a class="dropdown-item"  href="http://www.reddit.com/submit?url=/collections/{{ collection.id }}/{{ url }}&title={{ collection.name }}  Image Markup on WordFish" rel="nofollow" target="_blank" title="Share on Reddit"><i class="fa fa-reddit"></i> Reddit</a>
+        </div>
+</div>
+<a id="{{ fieldtype }}_link" href="{{ domain_name }}/collections/{{ collection.id }}/{{ url }}"><button class="btn btn-sm btn-primary">Markup!</button></a>
+{% endwith %}
+{% endif %}
+{% if fieldtype == "image_describe" %}
+{% with url="images/describe" %}  
+<div class="btn-group">
+    <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share</i></button>
+         <div class="dropdown-menu">
+         <a class="dropdown-item" href="https://twitter.com/intent/tweet?text=Describe Images on WordFish&url=/collections/{{ collection.id }}/{{ url }}" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i> Twitter</a>
+         <a class="dropdown-item" href="https://facebook.com/sharer.php?u=/collections/{{ collection.id }}/{{ url }} Describe Images on WordFish" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+        <a class="dropdown-item"  href="http://www.reddit.com/submit?url=/collections/{{ collection.id }}/{{ url }}&title={{ collection.name }}  Describe Images on WordFish" rel="nofollow" target="_blank" title="Share on Reddit"><i class="fa fa-reddit"></i> Reddit</a>
+        </div>
+</div>
+<a id="{{ fieldtype }}_link" href="{{ domain_name }}/collections/{{ collection.id }}/{{ url }}"><button class="btn btn-sm btn-primary">Describe!</button></a>
+{% endwith %}
+{% endif %}
+{% if fieldtype == "text_annotation" %}
+{% with url="text/annotate" %}  
+<div class="btn-group">
+    <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share</i></button>
+         <div class="dropdown-menu">
+         <a class="dropdown-item" href="https://twitter.com/intent/tweet?text=Text Annotation on WordFish&url=/collections/{{ collection.id }}/{{ url }}" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i> Twitter</a>
+         <a class="dropdown-item" href="https://facebook.com/sharer.php?u=/collections/{{ collection.id }}/{{ url }} Text Annotation on WordFish" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+        <a class="dropdown-item"  href="http://www.reddit.com/submit?url=/collections/{{ collection.id }}/{{ url }}&title={{ collection.name }}  Text Annotation on WordFish" rel="nofollow" target="_blank" title="Share on Reddit"><i class="fa fa-reddit"></i> Reddit</a>
+        </div>
+</div>
+<a id="{{ fieldtype }}_link" href="{{ domain_name }}/collections/{{ collection.id }}/{{ url }}"><button class="btn btn-sm btn-primary">Annotate!</button></a>
+{% endwith %}
+{% endif %}
+{% if fieldtype == "text_markup" %}
+{% with url="text/markup" %}  
+<div class="btn-group">
+    <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share</i></button>
+         <div class="dropdown-menu">
+         <a class="dropdown-item" href="https://twitter.com/intent/tweet?text=Text Markup on WordFish&url=/collections/{{ collection.id }}/{{ url }}" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i> Twitter</a>
+         <a class="dropdown-item" href="https://facebook.com/sharer.php?u=/collections/{{ collection.id }}/{{ url }} Text Markup on WordFish" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+        <a class="dropdown-item"  href="http://www.reddit.com/submit?url=/collections/{{ collection.id }}/{{ url }}&title={{ collection.name }}  Text Markup on WordFish" rel="nofollow" target="_blank" title="Share on Reddit"><i class="fa fa-reddit"></i> Reddit</a>
+        </div>
+</div>
+<a id="{{ fieldtype }}_link" href="{{ domain_name }}/collections/{{ collection.id }}/{{ url }}"><button class="btn btn-sm btn-primary">Markup!</button></a>
+{% endwith %}
+{% endif %}
+{% if fieldtype == "text_describe" %}
+{% with url="text/describe" %}  
+<div class="btn-group">
+    <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share</i></button>
+         <div class="dropdown-menu">
+         <a class="dropdown-item" href="https://twitter.com/intent/tweet?text=Describe Text on WordFish&url=/collections/{{ collection.id }}/{{ url }}" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i> Twitter</a>
+         <a class="dropdown-item" href="https://facebook.com/sharer.php?u=/collections/{{ collection.id }}/{{ url }} Describe Text on WordFish" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+        <a class="dropdown-item"  href="http://www.reddit.com/submit?url=/collections/{{ collection.id }}/{{ url }}&title={{ collection.name }}  Describe Text on WordFish" rel="nofollow" target="_blank" title="Share on Reddit"><i class="fa fa-reddit"></i> Reddit</a>
+        </div>
+</div>
+<a id="{{ fieldtype }}_link" href="{{ domain_name }}/collections/{{ collection.id }}/{{ url }}"><button class="btn btn-sm btn-primary">Describe!</button></a>
+{% endwith %}
+{% endif %}

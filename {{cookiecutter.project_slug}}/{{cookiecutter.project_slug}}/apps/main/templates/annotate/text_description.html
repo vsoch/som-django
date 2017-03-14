@@ -1,0 +1,87 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load humanize %}
+{% block head %}
+{% endblock %}
+{% block css %}
+<style>
+.som_text {
+  text-rendering: optimizeLegibility;
+  border-radius:5px;
+  background: #F7F7F7;
+  padding:20px;
+  font-size:16px;
+  line-height:1.5;
+}
+</style>
+{% endblock %}
+{% block content %}
+{% include 'messages/message.html' %}
+{% include 'base/loader.html' %}
+
+<div class="row">
+    <div class="col-md-6">
+        <p class="som_text">{{ text.original }}</p>
+    </div>
+    <div class="col-md-6">
+        <form id="save_description" class="form-horizontal" method="post" action="{% url 'describe_text' text.id %}">
+             <input type="hidden" name="image_id" id="{{ image.id }}" value="{{ image.id }}">  
+             <div class="form-group">
+                 <textarea class="form-control" rows="15" id="description" name="description">{{ description.description }}</textarea>
+             </div>
+            {% csrf_token %}
+        </form>
+
+        <div>
+            <button class="btn btn-primary" id="submit" style="margin-left:0px">Submit</button>
+            <button id="skip_button" class="btn btn-primary">Skip</button>
+        </div> 
+    </div>
+</div>
+<div class="row">
+    <div class='col-md-12'>
+         <span style="color:#CCC">{{ text.uid }}</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type='text/javascript'>
+$(function() {
+
+   $("#submit").click(function(){
+       $("form").submit();
+   });
+ 
+    // Left and right arrow keys navigate as well
+    $(document).keydown(function(e) {
+
+        if (e.which == 37) { 
+            history.back();
+            e.preventDefault();
+            return false;
+         }
+        
+        if (e.which == 39) { 
+           // Here is the previous description, if defined
+           previous_description = "{% if description %}{{ description.description }}{% endif %}"
+           current_description = $("#description").text();
+          
+           // If the previous description is the same as current, assume the user wants to skip
+           if (previous_description == current_description) {
+               document.location = "{% url 'collection_describe_text' collection.id %}"   
+           } else {
+               $("form").submit();
+           }
+           e.preventDefault();
+           return false;
+        }
+    });
+
+    $("#skip_button").click(function(){
+       document.location = "{% url 'collection_describe_text' collection.id %}"
+    });
+})
+</script>
+{% endblock %}

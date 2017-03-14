@@ -1,0 +1,11 @@
+__pycache__
+secrets.py
+.secret
+images/
+.dist/
+.build/
+migrations/
+.static/
+.tmp
+app.yaml
+sendgrid.env

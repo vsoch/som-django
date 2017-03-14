@@ -1,0 +1,31 @@
+{
+    "project_name": "somdb",
+    "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_') }}",
+    "author_name": "Vanessa Sochat",
+    "email": "vsochat@stanford.edu",
+    "description": "The somdb is a Django application for searching Stanford's School of Medicine's cloud database.",
+    "domain_name": "somdb.rit.stanford.edu",
+    "version": "0.0.1",
+    "timezone": "UTC",
+    "use_opbeat": "y",
+    "_copy_without_render": [
+             "*.html",
+             "*.css",
+             "*.js",
+             "*.png",
+             "*.jpg",
+             "*.jpeg",
+             "*.tiff",
+             "*.ico",
+             "*.xcf",
+             "*.ttf",
+             "*.eot",
+             "*.gif",
+             "*.otf",
+             "*.pyc",
+             "*.woff",
+             "*.woff2",
+             "*upload_tags1.py",
+             "*upload_tags.py"
+             ]
+}

@@ -1,0 +1,37 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block content %}
+{% include 'messages/message.html' %}
+{% include 'base/loader.html' %}
+<div class="row">
+    <div class="col-md-12">
+        <h3 class="title">{{ title }}</h3>
+            <main>
+                <div>
+                     {% crispy form %}
+                </div>
+                <div class="footer">
+            </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function(){
+
+    // Submit for on save button push
+    $("#submid-id-submit").click(function(){
+        $("#fade").show();
+        $('#loadfish').show();
+        $("form").attr("action","{% url 'edit_team' team.id %}");
+        $("form").submit();
+    });
+
+})
+</script>
+
+{% endblock %}

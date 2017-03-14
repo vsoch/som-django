@@ -1,0 +1,24 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h3 class="title">New Collection</h3>
+            <main>
+                <div>
+                     {% if collection.id %}
+                     <form  class="form-horizontal" method="post" action="{% url 'edit_collection' collection.id %}" >
+                     {% else %}
+                     <form  class="form-horizontal" method="post" action="{% url 'new_collection' %}" >
+                     {% endif %}
+                     {% csrf_token %}
+                     {% crispy form %}
+                     </form>
+                </div>
+                <div class="footer">
+            </main>
+    </div>
+</div>
+{% endblock %}

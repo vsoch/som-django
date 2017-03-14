@@ -1,0 +1,66 @@
+{% load staticfiles %}
+<style>
+mark{
+    background: orange;
+    color: black;
+}
+</style>
+<script src="{% static "js/mark.min.js" %}"></script>
+<script>
+$(document).ready(function(){
+
+    // If we have tags saved for local storage, use for markup
+    var tags = localStorage.getItem('markup-{{ collection.id }}')
+    if (tags != null) {
+        $("#markup").val(tags);
+        $("#markme").mark(tags.split(','));
+    } else {
+        {% if markup %}
+        $("#markup").val("{{ collection.markup }}");
+        $("#markme").mark({{ markup | safe }});
+        {% endif %}
+    }
+
+    // Allow the user to reset tags
+    $("#reset_markup").click(function(){
+        console.log("Markup reset to default.")
+        localStorage.removeItem('markup-{{ collection.id }}');
+        $("#markup").val("{{ collection.markup }}");
+        $('#markup').tagsinput('removeAll');
+        $("#markup").tagsinput('add','{{ collection.markup }}')
+        {% if markup %}
+        $("#markme").unmark().mark({{ markup | safe }});
+        {% endif %}
+    })
+
+    // Initialize the markup    
+    $('#markup').tagsinput({
+        tagClass: 'btn btn-sm btn-primary term-tag'
+    });
+ 
+
+    // On click, remove term
+    $('.term-tag').click(function() {
+        var tag = $(this).text();
+        $("#markup").tagsinput('remove',tag)
+    });
+
+
+    // On change, update the markup
+    $("#markup").on('change',function(){
+        console.log("Markup updated.")
+        var new_markup = $("#markup").val();
+        $("#markme").unmark().mark(new_markup.split(','));
+    })
+
+    // Save markup when the user clicks save
+    $("#savemarkup").click(function(){
+       console.log("Markup saved.")
+       markup = $("#markup").val();
+       $("#markme").unmark().mark(markup.split(','));
+       localStorage.setItem('markup-{{ collection.id }}', markup);
+    })
+
+
+});
+</script>

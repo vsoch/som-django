@@ -1,0 +1,43 @@
+<style>
+#tools {
+  min-height:180px;
+  margin-top:20px;
+  background-color:white;
+  padding:20px;
+}
+</style>
+
+<!-- Bottom bar to hint that tools are there... -->
+<nav class="navbar navbar-fixed-bottom navbar-dark bg-faded" style="background-color:#0275d8;margin-left:25%;margin-right:25%">
+  <a class="navbar-brand" id="tool-toggle" href="#">Annotation Tools 
+      <i style="padding-left:10px;float:right" id="tool_direction" class="fa fa-chevron-up"></i>
+      </a>
+  <br>
+  <div id="tools" style='display:none'>
+       <!--
+       <label>Annotation Sets</label>
+       <a href="{% url 'create_annotation_set' collection.id %}"><button type="button" class="btn btn-default btn-sm">New Annotation Set </button></a><br>
+ -->      
+       
+       {% if request.user in collection.annotators.all %}
+           <!-- Bulk annotation -->
+           {% if sid %}
+           <a href="{% url 'bulk_annotate' collection.id sid %}"><button type="button" class="btn btn-default btn-sm">Bulk Annotate Set</button></a> 
+           {% else %}
+           <a href="{% url 'bulk_annotate' collection.id %}"><button type="button" class="btn btn-default btn-sm">Bulk Annotate Set</button></a>
+           {% endif %}
+       {% endif %}
+
+       <!-- Form to clear all annotations -->
+       <form action="{% url 'clear_annotations' report.id %}" method="POST" id="clear_annotations">
+            <button type="button" class="btn btn-warning btn-sm" name="clear" id="clear_button" autocomplete="off">Clear Annotations</button>
+        </form>
+
+
+       <hr>
+       <label for="markup">Highlight Words</label>
+       <input name="markup" placeholder="type then ENTER to add, click to remove" id="markup" value="{{ collection.markup }}"></input>
+       <button id="savemarkup" type="submit" class="save btn btn-default btn-sm">Save</button>
+       <button id="reset_markup" class="save btn btn-default btn-sm">Reset</button>
+  </div>
+</nav>

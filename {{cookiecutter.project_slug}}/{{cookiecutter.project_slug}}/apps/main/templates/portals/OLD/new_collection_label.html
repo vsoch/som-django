@@ -1,0 +1,212 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block css %}
+<link href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="{% static "css/bootstrap-tagsinput.css"%}" media="screen" rel="stylesheet" type="text/css" />
+
+<style>
+/* must be capitalized */
+input {
+  text-transform: uppercase;
+}
+.lgroup-item{
+   min-height:130px;
+}
+.lgroup {
+   box-shadow: none !important;
+}
+.remove_label {
+  float:right;
+  border-radius: 3px;
+  padding-left:10px !important;
+  padding-right:10px !important;
+}
+.nav>li>a:hover, .nav>li>a:focus {
+  background-color: #0275d8;
+}
+.nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {
+  border-color:transparent !important;
+}
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+  color: #333 !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'messages/message.html' %}
+
+<div class="row">
+    <div class="header" style="padding-bottom:20px">
+        <h3 class="title" style="padding-bottom:20px">
+        <a href="{% url 'collection_details' collection.id %}"><i class="fa fa-chevron-left"></i> {{ collection.name }}</a></h3>
+    </div>
+</div>
+
+<div class="row" style="padding-top:50px">
+    <div class="col-md-12">
+        <p id='message_box' style="display:none" class='alert alert-info'></p>
+       
+
+<ul class="nav nav-pills" role="tablist" style="background-color:dodgerblue;border-radius:3px;padding:10px">
+  <li style="padding:5px"><button class="btn btn-primary btn-sm" data-toggle="pill" role="pill" style="color:white" href="#currentlabel">Active Labels</button></li>
+  <li style="padding:5px"><button class="btn btn-primary btn-sm" data-toggle="pill"  role="pill" href="#newlabel" style="color:white">Add New Label</button></li>
+  {% if labels %}
+  <li style="padding:5px"><button class="btn btn-primary btn-sm" data-toggle="pill"  role="pill" href="#existinglabel" style="color:white">Select from Existing</button></li>
+  {% endif %}
+</ul>
+
+<div class="tab-content">
+  <div id="currentlabel" class="tab-pane active" style="padding-top:20px">
+
+           {% if collection_labels %}
+            <table id="collection_labels" class="table table-responsive table-hover" width="100%">
+                <thead class="thead">
+                    <tr>
+                        <th>Label Name</th>
+                        <th>Options</th>
+                        {% if request.user == collection.owner %}
+                        <th></th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for label in collection_labels %}
+                <tr>
+                    <td>{{ label.name }}</td>
+                    <td>{{ label.label }}</td> 
+                    {% if request.user == collection.owner %}
+                    <td><a href="{% url 'remove_label' collection.id label.id %}"><button class="btn btn-danger btn-sm">Remove Label</button></a>                  
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="alert alert-info" style="margin-top:20px">Click "Add New Label" to create your first label.</p>
+            {% endif %} 
+
+
+  </div>
+  <div id="newlabel" class="tab-pane">
+
+        <!-- Here the user has the option to add a new label -->
+        <form action="{% url 'create_label' collection.id %}" method="post">
+
+            {% csrf_token %}
+
+            <div class="md-form input-group" style="padding-top:40px; padding-bottom:20px">
+                <input type="text" class="form-control" name="annotation_name" style="width:300px" placeholder="DISEASE_PRESENT" aria-describedby="labelname">
+                <span class="input-group-addon" id="labelname" style="float:left;width: 60px;">_label</span>
+            </div>
+
+            <h4 title="You can click the + to add more options, or x to remove">What are the options or choices for this label?</h4>
+            <ul class="list-group lgroup" id="label_list">
+                <li class="list-group-item lgroup-item">
+                    <input type="text" class="form-control" name="annotation_label_1" placeholder="PRESENT">
+                    <button title="remove this option from the label" type='button' class="remove_label btn btn-danger btn-sm"><i class="fa fa-close"></i></button>
+                </li>
+            </ul>
+            <button title="add a new option for the label" type='button' id="add_label" style='padding-left:10px;padding-right:10px' class="btn btn-primary btn-sm"><i class='fa fa-plus'></i></button>
+            <div class="text-xs-center" style="padding-top:20px">
+                <button type="submit" id="submit_button" value="OK" class="btn btn-primary">Add</button>
+            </div>
+        </form>
+
+
+  </div>
+  {% if labels %}
+  <div id="existinglabel" class="tab-pane">
+
+            <h2 style="padding-bottom:20px">Select from Existing</h2>
+
+            <table id="labels" class="display" cellspacing="0" width="100%">
+                <thead class="thead">
+                    <tr>
+                        <th>Label Name</th>
+                        <th>Options</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for label in labels %}
+                <tr>
+                    <td>{{ label.name }}</td>
+                    <td>{{ label.label }}</td> 
+                    <td><a class="add_existing" data-url="{% url 'create_label' collection.id label.id %}"><button class="btn btn-success btn-sm">Add Label</button></a>                  
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+
+  </div>
+  {% endif %}
+</div>
+
+
+{% endblock %}
+{% block scripts %}
+<script src="{% static "js/cookie-token.js" %}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+<script>
+$(document).ready(function(){
+
+   // prevent spaces in inputs
+   $('input').keypress(function( e ) {
+      if(e.which === 32)
+        return false;
+   });
+
+   // Add a row for a new label when the user clicks
+   $('#add_label').click(function(){
+       var number = 1 + Math.floor(Math.random() * 10000);
+       var template = '<li class="list-group-item lgroup-item"><input type="text" class="form-control" name="annotation_label_' + number + '" placeholder="PRESENT"><button type="button" class="remove_label btn btn-danger btn-sm"><i class="fa fa-close"></i></button></li>'
+       $("#label_list").append(template)  
+   })
+
+   // When a user clicks a label, it will be removed
+   $('.remove_label').click(function(){
+       $(this).parent().remove();  
+   })
+
+
+   // Create label with ajax, success will disabled/change text of button
+   $('.add_existing').click(function(){
+       var url = $(this).attr('data-url')
+       var button = this;
+   
+        $.ajax({
+            url : url, // the endpoint
+            type : "POST", // http method
+            
+            // handle a successful response
+            success : function(json) {
+                console.log(json); // log the returned json to the console
+                console.log("success"); // another sanity check
+                $(button).parent().parent().remove();
+                $('#message_box').text(json.result);
+                $('#message_box').show();
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                    " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                     console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+         });
+
+   })
+
+     //var annotations = JSON.stringify($("#update_annotation").serializeArray())
+
+})
+</script>
+{% endblock %}

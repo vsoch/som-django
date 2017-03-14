@@ -1,0 +1,174 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load dictionary_extras %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block css %}
+{% include "style/sliders.html" %}
+<style>
+.fish-step {
+border-radius:20px; 
+height:150px;
+padding:20px;
+width:250px;
+margin:auto;
+text-align: center;
+cursor:pointer;
+}
+.fish-text {
+color:white;
+font-size:20px;
+font-weight:600;
+margin-bottom:10px;
+}
+.fish-instruction {
+padding:20px;
+border-radius:5px;
+background-color:#F7F7F7;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'messages/message.html' %}
+
+<div class="row">
+    <!-- Container collection meta -->
+    <div class="col-md-10" style="padding-bottom:20px">
+               <h3 class="title">
+               <img width="100px" src="{% static 'img/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}.png' %}" style="position:relative;top:-5px;border-radius:35px; padding-right:20px;margin-right:15px"/><a href="{{ collection.get_absolute_url }}">{{ collection.name }}</a></h3>
+    </div>
+    <div class="col-md-2" style="float-right;text-align:right">
+
+  <!-- Collection Sharing -->
+  <div class="btn-group">
+      <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share</i></button>
+         <div class="dropdown-menu">
+         <a class="dropdown-item" href="https://twitter.com/intent/tweet?text={% url 'collection_start' collection.id %} Annotation on WordFish&url={{ collection.get_absolute_url }}" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i> Twitter</a>
+         <a class="dropdown-item" href="https://facebook.com/sharer.php?u={% url 'collection_start' collection.id %} Annotation on WordFish" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+        <a class="dropdown-item"  href="http://www.reddit.com/submit?url={% url 'collection_start' collection.id %}&title={{ collection.name }}  Annotation on WordFish" rel="nofollow" target="_blank" title="Share on Reddit"><i class="fa fa-reddit"></i> Reddit</a>
+        </div>
+    </div>
+
+
+    </div>
+</div>
+
+{% if collection.entity_set.count > 0 %}
+
+{% for fieldtype, fieldvalues in collection_status.items %}
+{% if fieldvalues.active %}
+<!-- Collection type is active, by way of default and having text/images, and not disabled by owner-->
+<div class="row" style="padding-top:20px;padding-bottom:20px">
+    <div class="col-md-3">
+        <div class="fish-step" id="{{ fieldtype }}" style="background-color:#0275d8">
+            <i class="fa {{ fieldvalues.symbol }}" style="font-size:100px;color:white"></i>
+            <p class="fish-text">{{ fieldvalues.title }}</p><br>
+        </div>
+    </div>
+    <div class="col-md-9">
+        {% if fieldvalues.instruction %}
+        {% if edit_permission %}
+        <p class="fish-instruction" id="fish-instruction-{{ fieldtype }}" contenteditable="true" onkeyup="saveInstruction('{{ fieldtype }}','{{ collection.id }}')">{{ fieldvalues.instruction }}</p>
+        <a style="float:right" href="{% url 'collection_activate' collection.id fieldtype %}"><button class="btn btn-sm btn-danger">Deactivate</button></a>
+        {% else %}
+        <p class="fish-instruction">{{ fieldvalues.instruction }}</p>
+        {% endif %}
+        {% else %}
+        {% if edit_permission %}
+        <p class="fish-instruction" id="fish-instruction-{{ fieldtype }}" contenteditable="true" onkeyup="saveInstruction('{{ fieldtype }}','{{ collection.id }}')">Click to edit instructions for this task.</p>
+        <a style="float:right" href="{% url 'collection_activate' collection.id fieldtype %}"><button class="btn btn-sm btn-danger">Deactivate</button></a>
+        {% endif %}
+        {% endif %}
+        {% include "social/collection_sharing.html" %}
+    </div>
+</div>
+{% else %}
+
+<!-- Collection type is not active by way of default and having text/images, and not disabled by owner-->
+{% if edit_permission %}
+    
+<div class="row" style="padding-top:20px; padding-bottom:20px">
+    <div class="col-md-3">
+        <div class="fish-step" id="{{ fieldtype }}" style="background-color:#999">
+            <i class="fa {{ fieldvalues.symbol }}" style="font-size:100px;color:white"></i>
+            <p class="fish-text">{{ fieldvalues.title }}</p><br>
+        </div>
+    </div>
+    <div class="col-md-9">
+        {% if fieldtype in image_types %}
+            {% if collection.has_images %}
+                {% if fieldvalues.instruction %}
+                <p class="fish-instruction" id="fish-instruction-{{ fieldtype }}" contenteditable="true" onkeyup="saveInstruction('{{ fieldtype }}','{{ collection.id }}')">{{ fieldvalues.instruction }}</p>
+                {% endif %}
+                <a style="float:right" href="{% url 'collection_activate' collection.id fieldtype %}"><button class="btn btn-sm btn-success">Activate</button></a>
+            {% else %}
+                <p class="fish-instruction alert alert-info">This collection does not have images for {{ fieldvalues.title }}. </p>
+            {% endif %}
+        {% else %}
+            {% if collection.has_text %}
+                {% if fieldvalues.instruction %}
+                <p class="fish-instruction" id="fish-instruction-{{ fieldtype }}" contenteditable="true" onkeyup="saveInstruction('{{ fieldtype }}','{{ collection.id }})'">{{ fieldvalues.instruction }}</p>
+                {% endif %}
+                <a style="float:right" href="{% url 'collection_activate' collection.id fieldtype %}"><button class="btn btn-sm btn-success">Activate</button></a>
+            {% else %}
+                <p class="fish-instruction alert alert-info">This collection does not have text for {{ fieldvalues.title }}. </p>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{% else %}
+<p class="alert alert-info">This collection has no datasets to annotate or markup! Why don't you try <a href="{% url 'upload_datasets
+ collection.id %}">adding some?</a></p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static "js/cookie-token.js" %}"></script>
+{% include "style/datatable.html" %}
+<script>
+    // On change of instruction, update server
+    function saveInstruction(fieldtype,collection_id) {
+        
+       var instruction = $("#fish-instruction-" + fieldtype).text();
+
+       $.ajax({
+            url : "/collections/" + collection_id + "/instruction/update", // the endpoint
+            type : "POST", // http method
+            data: {"csrfmiddlewaretoken": "{{ csrf_token }}",
+                   "instruction": instruction,
+                   "fieldtype":fieldtype },
+
+            // handle a successful response
+            success : function(json) {
+                console.log(json); // log the returned json to the console
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                    " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+       });
+
+    }
+$(document).ready(function() {
+
+    $(".fish-step").click(function(){
+       var fish_button = "#" + $(this).attr('id') + "_link"
+       var url = $(fish_button).attr('href');
+       document.location = url;
+    })
+
+    // Enable tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+});
+</script>
+{% endblock %}

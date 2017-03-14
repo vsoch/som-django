@@ -1,0 +1,31 @@
+{% extends "main/base.html" %}
+{% load staticfiles %}
+{% block head %}
+{% endblock %}
+{% block content %}
+
+        <div id="fh5co-team">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1">
+                        <div class="row">
+                            <h2 class="section-lead text-center">API</h2>
+                            <p class="text-center">Application Programming Interface (under development)</p>
+
+                            <em>The WhatIsIt RESTful API</em> provides programmatic access to public reports. You can use this interface to explore the data, and we recommend our (to be developed) command line client for downloading and using data.</p>
+
+                            <div class="panes">
+                                <div class="pane">
+                                    <div>
+                                        <strong>Reports</strong> <a href="/api/reports" target="_blank">{{ domain }}/api/reports</a><br>
+                                        <strong>Collections</strong> <a href="/api/collections" target="_blank">{{ domain }}/api/collections</a><br>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>     
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

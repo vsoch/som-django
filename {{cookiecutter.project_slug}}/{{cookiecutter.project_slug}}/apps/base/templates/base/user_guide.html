@@ -1,0 +1,81 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+{% block head %}
+<style>
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <h1 style='padding-bottom:30px'>User Guide</h1>
+        <h4>WordFish is a platform for markup and annotation of text and images.</h4>
+
+        <p>The standard flow of machine learning research usually looks something like this:</p><br>
+             <a href="#images-and-text"><button class="btn btn-lg btn-warning" style="margin-right:10px;margin-left:10px">Images and Text</button></a>
+                 <i class="fa fa-arrow-right fa-2x"></i>
+             <a href="#labels-and-markup"><button class="btn btn-lg btn-success" style="margin-right:10px;margin-left:10px">Labels and Markup</button></a>
+                 <i class="fa fa-arrow-right fa-2x"></i>
+             <a href="#machine-learning"><button class="btn btn-lg btn-info" style="margin-right:10px;margin-left:10px">Machine Learning</button></a>
+                 <i class="fa fa-arrow-right fa-2x"></i>
+             <a href="#discovery"><button class="btn btn-lg btn-primary" style="margin-left:10px">Discovery</button></a>
+        </p><br><p>We unfortunately run into bottlenecks. Let's talk about each of the steps, and how WordFish is going to help us.</p>
+
+	<div style="margin-top:50px">
+            <div class="card">
+		<div class="card-block" id="image-and-text">
+		<h4 class="card-title btn btn-warning">Step 1: Organize your data</h4>
+		<p class="card-text">Getting the data, and moving it around is usually hard. Using the <a href="https://www.github.com/radinformatics/{{cookiecutter.project_slug}}-standard" target="_blank">WordFish standard</a>, you can zip up your data, and upload it to a <a href="{% url 'new_collection' %}">new collection</a>, and you are ready to go. What does the standard look like? It's just a <a href="http://langlotzlab.stanford.edu/{{cookiecutter.project_slug}}-standard/examples/" target="_blank">simple organization</a> of images and text files in folders on your computer. If you need help validating a dataset, we provide <a href="https://asciinema.org/a/101745?speed=2">a tool</a> to do that, along with <a href="https://github.com/radinformatics/som-tools/tree/master/examples/data-browser/cookies" target="_blank">sample datasets</a>.</p>
+	    </div>
+	</div>
+
+            <div class="card" style="margin-top:40px" id="labels-and-markup">
+		<div class="card-block">
+		<h4 class="card-title btn btn-success">Step 2: Annotate/Markup Images and Text</h4><br><br>
+	        <h3>Annotation</h3>
+                <p class="card-text">Annotation means that you want to ascribe a specific label to some text or all or part of an image. Usually, we want to annotate datasets for supervised machine learning, because we want to use features from the text or image to predict the label. In the case of annotation, we want to define a clear set of labels to use, each with one or more options (e.g., label "disease" has options "present" and "absent." WordFish provides an easy way to do this, for either text or images.
+                 <ul>
+                    <li>Define labels for your collection</li>
+                    <li>Send out a link to annotate images or text for those labels</li>
+                 </ul><br>
+                <h3>Markup</h3>
+                <p class="card-text">Markup is like freehand drawing. Whether you are looking at text or an image, it means that you are free to circle or highlight an idea to indicate something general like "this is important." An image markup task might ask a radiologist to circle an area of interest, and this area might be used to direct an unsupervised classifier to focus on an area of an image. A text markup task might mean asking a political scientist to highlight the sentence(s) that were most convincing for a report. A markup gives the user freedom to select or highlight information. Using WordFish, after you upload your data, you can do different kinds of markup:
+                 <ul>
+                    <li><strong>Describe</strong> means that the user can write openly to describe an image or text. For example, you might ask a user to write about how a painting makes him or her feel.</li>
+                    <li><strong>Markup Images</strong> means that the user can draw freely on your image. You can provide any (or no) instruction on how you want this done. An overlay is saved with the markup with a matching image, so you can carry the markup and image forward to your machine learning task.</li>
+                    <li><strong>Markup Text</strong> This comes down to highlighting words or chunks of text. For example, we might ask a user to highlight ingredients in a recipe, and then train a classifier to do the same.</li>
+                 </ul><br>
+                </p>
+	    </div>
+	</div>
+
+	<div style="margin-top:30px">
+            <div class="card" id="machine-learning"> 
+		<div class="card-block">
+		<h4 class="card-title btn btn-info">Step 3: Download your data for Machine Learning</h4>
+		<p class="card-text">Once your data is in WordFish, the annotations, markups, and original images are available via our <a href="/api">API</a> for you to use programatically for machine learning. You can also export your dataset from the interface, or link up directly with cloud machine learning services (under development).</p>
+	    </div>
+	</div>
+
+	<div style="margin-top:20px;padding-bottom:20px">
+            <div class="card" id="discovery">
+		<div class="card-block">
+		<h4 class="card-title btn btn-primary">Step 4: Discovery</h4>
+		<p class="card-text">This is up to you, dawg. Once you've made it here, by using WordFish you can be ensured that the entire process, from moving data from it's origin through machine learning, is programmatic and reproducible. When you have more data, it plugs in seamlessly.</p>
+	    </div>
+	</div>
+
+        <br><br>
+        <a href="{% url 'collections' %}" style="cursor:pointer"><button class="btn btn-primary btn-lg">Find Collections!</button>
+
+    </div>           
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function(){
+
+})
+</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+{% block head %}
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12" style="line-height:1.5em">
+        <h2>What is it?</h2>
+        <p>In a sea of things that need annotation, you would be lucky to find a Wordfish. Wordfish is exactly that: an annotation tool for experts to label things. It is an effort toward collaborative annotation to produce publicly available datasets for research. Wordfish will (eventually) allow for a combination of human- and algorithm- derived annotations of reports. This work is being done by the <a href="http://langlotzlab.stanford.edu" target="_blank">Langlotzlab</a> at Stanford University.</p><br>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4" style="padding:50px;line-height:1.5em">
+        <a href="{% url 'collections' %}"><button class="btn btn-primary" type="button">Browse Collections</button></a>
+    </div>
+    <div class="col-md-8" style="padding:50px;line-height:1.5em">
+        <img style="float:right;margin-right:50px" src="{% static 'img/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}.png' %}"/>
+    </div>
+</div>
+
+<hr>
+{% endblock %}
+
+
+

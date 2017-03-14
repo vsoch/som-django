@@ -1,0 +1,106 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block content %}
+{% include 'messages/message.html' %}
+<div class="row">
+
+    <div class="col-md-12">
+
+        <!-- Content -->
+        <article id="content">
+            <header>
+                <h2>Teams <i data-toggle="tooltip" title="These are all public teams on WordFish" class="fa fa-question-circle"></i></h2>
+                {% if not teams %}
+                <p>WordFish does not have any teams! Why don't you <a href="{% url 'new_team' %}">make a team?</p>
+                {% endif %}
+            </header>
+            {% if teams %}
+            <table id="teams_table" class="mdl-data-table" cellspacing="0" width="100%" style="padding-top:20px"> 
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Members</th>
+                    <th>Image</th>
+                    <th>Annotations</th>
+                    <th>Action</th>
+               </tr>
+           </thead>
+           <tbody>
+           {% for team in teams %}
+               <tr>
+                   <td>{{ team.ranking }}</td>
+                   <td><a href="{% url 'team_details' team.id %}">{{ team.name }}</a></td>
+                   <td>{{ team.members.count }}</td>
+                   <td>{% if team.team_image %}
+                       <img width="50px" src="{{ team.team_image.url }}">
+                       {% else %}
+                       <img width="50px" src="{% static 'img/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}.png' %}">
+                       {% endif %}
+                   </td>
+                   <td>{{ team.annotation_count }}</td>
+                   <td>{% if user_team == team %}
+                      <a href="{% url 'team_details' team.id %}"><button class="btn btn-primary" type="button" id="team_details">View your Team</button></a>
+                       {% else %}
+                           {% if user_team %}
+                      <a href="{% url 'join_team' team.id %}"><button class="btn btn-info btn-primary" type="button" id="join_team">Change Team</button></a> 
+                           {% else %}
+ <a href="{% url 'join_team' team.id %}"><button class="btn btn-info btn-primary" type="button" id="join_team">Join</button></a>
+                           {% endif %}
+                       {% endif %}
+                   </td>
+               </tr>
+          {% endfor %}
+          </tbody>
+          </table>
+          <p style='margin-top:50px' class='alert alert-success'>Team Rankings are re-calculated on a nightly basis. If you've made annotations, check your new ranking tomorrow.</p>
+         {% endif %}
+        </article>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        {% if not user_team %}
+        <a href="{% url 'new_team' %}"><button class="btn btn-default">Create a Team</button></a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% include "style/datatable.html" %}
+<script>
+$(document).ready(function() {
+
+  $("#join_team").click(function(){
+      confirm("Are you sure you want to do this? You are only allowed one team. Any previous memberships will be removed.");
+  })
+
+  // Enable tooltips
+  $('[data-toggle="tooltip"]').tooltip();
+
+
+  $('#teams_table').dataTable({
+    "columns": [
+      { "width": "10%" },
+      { "width": "30%" },
+      { "width": "10%" },
+      { "width": "10%" },
+      { "width": "40%" },
+    ],
+    "pageLength": 25,
+        columnDefs: [
+            {
+                targets: [ 0, 1, 2, 3, 4 ],
+                className: 'mdl-data-table__cell--non-numeric'
+            }
+        ]
+  });
+
+});
+
+</script>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends "base/base.html" %}
+{% load dictionary_extras %}
+{% load math_extras %}
+{% load staticfiles %}
+{% load humanize %}
+{% block css %}
+<link rel="stylesheet" href="{% static "css/calendar-heatmap.css" %}" media="screen">
+<style>
+.progress {
+  height: 50px;
+}
+.progress > svg {
+  height: 100%;
+  display: block;
+}
+</style>
+{% endblock %}
+{% block content %}
+{% include 'messages/message.html' %}
+
+<div class="row" style='padding-top:20px;padding-bottom:20px'>
+    <div class="col-md-12">
+        <a href="{% url 'collection_details' collection.id %}"><h2>{{ collection.name }}</h2></a>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+
+    <ul class="nav nav-pills" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#summary" role="pill">Summary</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#stats" role="pill">Stats</a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="summary" role="tabpanel" style='padding-top:20px'>
+
+            <div class="row" style='padding-top:20px'>
+                <div class="col-md-3">
+                   <a href="{% url 'collection_stats_detail' collection.id "image_descriptions" %}"><h4>Image Descriptions</h4></a>
+                   <p class="alert alert-success">{{ counts|access:"image descriptions" }}</p>
+                </div>
+                <div class="col-md-9" style='padding-top:8px'>
+                    <span style="color:#999;float:right">% described by at least 1</span><br>
+                    <div class="progress" id="image_descriptions_progress"></div>
+                </div>
+            </div>
+
+            <div class="row" style='padding-top:20px'>
+                <div class="col-md-3">
+                   <a href="{% url 'collection_stats_detail' collection.id "image_markups" %}"><h4>Image Markups</h4></a>
+                   <p class="alert alert-success">{{ counts|access:"image markups" }}</p>
+                </div>
+                <div class="col-md-9" style='padding-top:8px'>
+                    <span style="color:#999;float:right">% marked up by at least 1</span><br>
+                    <div class="progress" id="image_markups_progress"></div>
+                </div>
+            </div>
+
+            <div class="row" style='padding-top:20px'>
+                <div class="col-md-3">
+                   <a href="{% url 'collection_stats_detail' collection.id "text_descriptions" %}"><h4>Text Descriptions</h4></a>
+                   <p class="alert alert-info">{{ counts|access:"text descriptions" }}</p>
+                </div>
+                <div class="col-md-9" style='padding-top:8px'>
+                    <span style="color:#999;float:right">% described by at least 1</span><br>
+                    <div class="progress" id="text_descriptions_progress"></div>
+                </div>
+            </div>
+
+            <div class="row" style='padding-top:20px'>
+                <div class="col-md-3">
+                   <a href="{% url 'collection_stats_detail' collection.id "text_markups" %}"><h4>Text Markups</h4></a>
+                   <p class="alert alert-info">{{ counts|access:"text markups" }}</p>
+                </div>
+                <div class="col-md-9" style='padding-top:8px'>
+                    <span style="color:#999;float:right">% markup up by at least 1</span><br>
+                    <div class="progress" id="text_markups_progress"></div>
+                </div>
+            </div>
+
+
+            <div class="row" style='padding-top:20px'>
+                <div class="col-md-3">
+                   <a href="{% url 'collection_stats_detail' collection.id "text_annotations" %}"><h4>Text Annotations</h4></a>
+                </div>
+                <div class="col-md-9" style='padding-top:8px'>
+                   <span style="color:#999;float:right">% must be broken down by label type</span><br>
+                </div>
+                <div class="col-md-3">
+                   <a href="{% url 'collection_stats_detail' collection.id "image_annotations" %}"><h4>Image Annotations</h4></a>
+                </div>
+                <div class="col-md-9" style='padding-top:8px'>
+                   <span style="color:#999;float:right">% must be broken down by label type</span><br>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="tab-pane" id="stats" style="padding-top:30px" role="tabpanel">
+            <div class="table-responsive table-striped">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task,count in counts.items %}
+                           <tr>
+                           {% if task == "image annotations" or task == "text annotations" %}
+                              <td>{{ task }}</td>
+                              {% if count.items|length > 0 %}
+                              <td>{% for label,subcounts in count.items %}
+                                  {% for option,subcount in subcounts.items %}
+                                  <span style='min-width:100px'>{{ label }}</span> : {{ option }} : <span style="color:blue;font-weight:600">{{ subcount }}</span><br>
+                                  {% endfor %}
+                                  {% endfor %}
+                              </td>
+                              {% else %}
+                              <td>0</td>
+                              {% endif %}
+                            {% else %}
+                              <td>{{ task }}</td>
+                              <td>{{ count }}</td>
+                            {% endif %}
+                         </tr>   
+                        {% endfor %}
+                    </tbody>
+               </table>
+             </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{% static "js/calendar-heatmap.js" %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js" charset="utf-8"></script>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="{% static "js/progressbar.min.js" %}"></script>
+<script src="{% static "js/cookie-token.js" %}"></script>
+<script>
+
+$(document).ready(function() {
+ 
+    function make_progressbar(divname,amount,color) {
+        var progress = new ProgressBar.Line(divname, {
+            color: color,
+            duration: 3000,
+            easing: 'easeInOut'
+        });
+        progress.animate(amount);
+    }
+
+    {% with value=counts|access:"image descriptions"|divide:image_count %}       
+    make_progressbar('#image_descriptions_progress',{{ value }},'#dff0d8')
+    {% endwith %}
+    {% with value=counts|access:"image markups"|divide:image_count %}       
+    make_progressbar('#image_markups_progress',{{ value }},'#dff0d8')
+    {% endwith %}
+    {% with value=counts|access:"text descriptions"|divide:text_count %}       
+    make_progressbar('#text_descriptions_progress',{{ value }},'#bcdff1')
+    {% endwith %}
+    {% with value=counts|access:"text markups"|divide:text_count %}       
+    make_progressbar('#text_markups_progress',{{ value }},'#bcdff1')
+    {% endwith %}
+  
+    // Enable tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+});
+
+</script>
+{% endblock %}

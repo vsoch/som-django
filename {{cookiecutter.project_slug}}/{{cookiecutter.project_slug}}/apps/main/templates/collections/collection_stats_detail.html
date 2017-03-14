@@ -1,0 +1,172 @@
+{% extends "base/base.html" %}
+{% load dictionary_extras %}
+{% load math_extras %}
+{% load string_extras %}
+{% load staticfiles %}
+{% load humanize %}
+{% block css %}
+<style>
+.progress-detail {
+  height: 50px;
+}
+.progress {
+  height: 50px;
+}
+.progress > svg {
+  height: 100%;
+  display: block;
+}
+</style>
+{% endblock %}
+{% block content %}
+{% include 'messages/message.html' %}
+
+<div class="row" style='padding-top:20px;padding-bottom:20px'>
+    <div class="col-md-12">
+        <a href="{% url 'collection_stats' collection.id %}"><h2>{{ collection.name }}: {{ fieldtype|replace:"_, " }}</h2></a>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+
+    <ul class="nav nav-pills" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#summary" role="pill">Summary</a>
+        </li>
+    </ul>
+
+    {% if fieldtype == "text_annotations" or fieldtype == "image_annotations" %}
+
+
+            {% for stat in counts %}
+            <div class="row" style='padding-top:20px'>
+                <div class="col-md-3">
+                   <h4>{{ stat.user.username }}</h4>
+                   {% if fieldtype == "image_annotations" %}
+                       <p class="alert alert-info" style="font-weight:600;font-size:16px">Total: {{ stat.count|add_values }}/{{ image_count }}</p>
+                       {% for label,count in stat.count.items %}
+                           {% if count > 0 %}
+                           <p class="text-align:right;font-weight:600">{{ label }}: {{ count }}/{{ image_count }}</p> 
+                           {% endif %}
+                       {% endfor %}
+                   {% else %}
+                       <p class="alert alert-info" style="font-weight:600;font-size:16px">Total: {{ stat.count|add_values }}/{{ text_count }}</p>
+                       {% for label,count in stat.count.items %}
+                           {% if count > 0 %}
+                           <p class="text-align:right;font-weight:600">{{ label }}: {{ count }}/{{ text_count }}</p> 
+                           {% endif %}
+                       {% endfor %}
+                   {% endif %}
+                </div>
+                <div class="col-md-9" style='padding-top:8px'>
+                    <span style="color:#999;float:right">{{ stat.user.username }}</span><br>
+                    <div class="progress" id="user_progress_{{ stat.user.id }}"></div><br>
+                   {% for label,count in stat.count.items %}
+                      {% if count > 0 %}
+                    <p class="progress-detail" id="user_progress_{{ stat.user.id }}_{{ label }}"></p>
+                      {% endif %}
+                   {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+    {% else %} 
+    <div class="tab-content">
+        <div class="tab-pane active" id="summary" role="tabpanel" style='padding-top:20px'>
+
+            {% for stat in counts %}
+            <div class="row" style='padding-top:20px'>
+                <div class="col-md-3">
+                   <h4>{{ stat.user.username }}</h4>
+                   {% if fieldtype == "image_markups" or fieldtype == "image_descriptions" %}
+                   <p class="alert alert-info" style="font-weight:600;font-size:16px">{{ stat.count }}/{{ image_count }}</p>
+                   {% endif %}
+                   {% if fieldtype == "text_markups" or fieldtype == "text_descriptions" %}
+                   <p class="alert alert-info" style="font-weight:600;font-size:16px">{{ stat.count }}/{{ text_count }}</p>
+                   {% endif %}
+                </div>
+                <div class="col-md-9" style='padding-top:8px'>
+                    <span style="color:#999;float:right">% described by at least 1</span><br>
+                    <div class="progress" id="user_progress_{{ stat.user.id }}"></div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+    {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{% static "js/calendar-heatmap.js" %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js" charset="utf-8"></script>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="{% static "js/progressbar.min.js" %}"></script>
+<script src="{% static "js/cookie-token.js" %}"></script>
+<script>
+
+$(document).ready(function() {
+ 
+    function make_progressbar(divname,amount,color) {
+        var progress = new ProgressBar.Line(divname, {
+            color: color,
+            duration: 3000,
+            easing: 'easeInOut'
+        });
+        progress.animate(amount);
+    }
+
+    {% if fieldtype == "text_annotations" or fieldtype == "image_annotations" %}
+        {% for stat in counts %}
+            {% if fieldtype == "image_annotations" %}
+                {% with value=stat.count|add_values|divide:image_count %}
+                make_progressbar('#user_progress_{{ stat.user.id }}',{{ value }},'#dff0d8')
+                {% endwith %}
+                {% for label,count in stat.count.items %}
+                    {% if count > 0 %}
+                        {% with value=count|divide:image_count %}
+                        make_progressbar('#user_progress_{{ stat.user.id }}_{{ label }}',{{ value }},'#dff0d8')
+                        {% endwith %}
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% with value=stat.count|add_values|divide:text_count %}
+                make_progressbar('#user_progress_{{ stat.user.id }}',{{ value }},'#dff0d8')
+                {% endwith %}
+                {% for label,count in stat.count.items %}
+                    {% if count > 0 %}
+                        {% with value=count|divide:text_count %}
+                        make_progressbar('#user_progress_{{ stat.user.id }}_{{ label }}',{{ value }},'#dff0d8')
+                        {% endwith %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+
+    {% else %}
+        {% for stat in counts %}
+            {% if fieldtype == "image_markups" or fieldtype == "image_descriptions" %}
+            {% with value=stat.count|divide:image_count %}
+            make_progressbar('#user_progress_{{ stat.user.id }}',{{ value }},'#dff0d8')
+            {% endwith %}
+            {% endif %}
+            {% if fieldtype == "text_markups" or fieldtype == "text_descriptions" %}
+            {% with value=stat.count|divide:text_count %}
+            make_progressbar('#user_progress_{{ stat.user.id }}',{{ value }},'#dff0d8')
+            {% endwith %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+  
+    // Enable tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+});
+
+</script>
+{% endblock %}

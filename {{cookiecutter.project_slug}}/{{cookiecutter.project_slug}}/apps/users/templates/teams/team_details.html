@@ -1,0 +1,95 @@
+{% extends "base/base.html" %}
+{% load dictionary_extras %}
+{% load staticfiles %}
+{% load humanize %}
+{% block content %}
+{% include 'messages/message.html' %}
+<div class="row">
+
+    <!-- Team Details -->
+    <div class="col-md-8">
+        <div class="card card-block"  style='padding:20px'>
+            <ul class="alert alert-info">
+                 <li style="margin-left:25px">Total Members: {{ team.members.count|intcomma }}</li>
+                 <li style="margin-left:25px">Annotations: {{ annotation_counts.total|intcomma }}</li>
+            </ul>
+
+            {% if request.user not in team.members.all %}
+             <a href="{% url 'join_team' team.id %}"><button type="button" class="btn btn-default waves-effect waves-light">Join Team</button></a>
+            {% else %}
+                <p class="alert alert-info">You are a member of this team.</p>
+            {% endif %}
+
+            {% if edit_permission %}
+                <a href="{% url 'edit_team' team.id %}"><button type="button" class="btn btn-default waves-effect waves-light">Edit Team</button></a>
+            {% endif %}
+
+     </div>
+  </div>
+
+    <div class="col-md-4">
+        <div class="card card-block" >
+                   {% if team.team_image %}
+                   <img width="250px" src="{{ team.team_image.url }}" style="position:relative;top:-5px;border-radius:35px; padding-right:20px;margin-right:15px"/>
+                   {% else %}
+                   <img width="250px" src="{% static 'img/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}.png' %}" style="position:relative;top:-5px;border-radius:35px; padding-right:20px;margin-right:15px"/>
+                   {% endif %}
+         <br><h4 style='text-align:right;color:666'>{{ team.name }}</h4>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+    <!-- Team Members -->
+    {% if team.members.count > 0 %}
+      
+        <h3 style='padding-top:10px'>Team Members</h3>
+        <table id="annotators" class="mdl-data-table" cellspacing="0" width="100%" style="padding-top:20px"> 
+           <thead>
+               <tr>
+                   <th>Name</th>
+                   <th>Annotations</th>
+               </tr>
+           </thead>
+           <tbody>
+           {% for member in team.members.all %}
+               <tr>
+                   <td>{{ member.username }}</td>
+                   <td>{{ annotation_counts|access:member.username }}</td>
+               </tr>
+            {% endfor %}
+           </tbody>
+       </table>
+{% else %}
+
+     <p>There are no members in this team!</p>
+
+{% endif %}
+
+{% endblock %}
+{% block scripts %}
+{% include "style/datatable.html" %}
+<style>
+.mdl-grid {
+   padding-bottom:20px !important;
+}
+</style>
+<script>
+$(document).ready(function(){
+
+     $('#annotators').DataTable( {
+        columnDefs: [
+            {
+                targets: [ 0, 1 ],
+                className: 'mdl-data-table__cell--non-numeric'
+            }
+        ]
+    } );
+
+
+
+})
+</script>
+{% endblock %}

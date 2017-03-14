@@ -1,0 +1,220 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block css %}
+{% include "style/sliders.html" %}
+<style>
+.pagination {
+  padding-top:30px !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'messages/message.html' %}
+<span id="results"></span>
+{% include 'base/loader.html' %}
+<div class="row">
+    <!-- Container collection meta -->
+    <div class="col-md-10" style="padding-bottom:20px">
+               <h3 class="title">
+               <img width="100px" src="{% static 'img/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}.png' %}" style="position:relative;top:-5px;border-radius:35px; padding-right:20px;margin-right:15px"/>{{ collection.name }}</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 dropdown" style="padding-bottom:50px">
+
+     <!-- Collection Management -->
+     {% if edit_permission %}
+     <div class="btn-group">
+         <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id='upload-entities'>Edit</button>
+         <div class="dropdown-menu">
+             <a class="dropdown-item" href="{% url 'upload_datasets' collection.id %}">Upload Entities</a>
+              <a class="dropdown-item" href="{% url 'view_label' collection.id %}">Edit Labels</a>
+              <a class="dropdown-item" href="{% url 'edit_collection' collection.id %}">Edit Collection</a>
+         </div>
+      </div><!-- /btn-group -->
+      {% endif %}
+
+      <div class="btn-group">
+          <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">View</button>
+          <div class="dropdown-menu">
+              {% if collection.entity_set.count > 0 %}
+              <a class="dropdown-item" href="{% url 'collection_explorer' collection.id %}">Collection Explorer</a>
+              <a class="dropdown-item" href="{% url 'collection_stats' collection.id %}">Collection Stats</a>
+              {% endif %}
+          </div>
+      </div>
+
+  {% if collection.has_images == True or collection.has_text == True %}
+  <div class="btn-group" style="float:right">
+    <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Start </button>
+    <div class="dropdown-menu">
+     <a class="dropdown-item" href="{% url 'collection_start' collection.id %}">Annotation Portal</a>
+    </div>
+  </div>
+
+  <!-- Collection Sharing -->
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Share</i></button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" href="https://twitter.com/intent/tweet?text={{ collection.name }} Annotation on WordFish&url={{ collection.get_absolute_url }}" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i> Twitter</a>
+      <a class="dropdown-item" href="https://facebook.com/sharer.php?u={{ collection.get_absolute_url }} Annotation on WordFish" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i> Facebook</a>
+      <a class="dropdown-item"  href="http://www.reddit.com/submit?url={{ collection.get_absolute_url }}&title={{ collection.name }}  Annotation on WordFish" rel="nofollow" target="_blank" title="Share on Reddit"><i class="fa fa-reddit"></i> Reddit</a>
+    </div>
+</div>
+
+
+     <div class="mdl-tooltip" for="upload-entities">
+         <p>Currently, a set of items must be folder or compressed (.tar.gz or .zip) folder that conforms to the <a href="https://www.github.com/radinformatics/{{cookiecutter.project_slug}}-standard" target="_blank">WordFish standard</a>.</p>
+     </div>
+     {% else %}<!-- No edit permission, but can annotate -->
+
+     {% if collection.has_text == True or collection.has_images == True %}
+     <div class="btn-group">
+         <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Links</button>
+         <div class="dropdown-menu">
+             {% if collection.has_text == True and collection.has_images == True %}
+             <a class="dropdown-item" href="{% url 'collection_start' collection.id %}">Full Annotation Portal</a>
+             {% endif %}
+             <div class="dropdown-divider"></div>
+             {% if collection.has_text  %}
+             <a class="dropdown-item" href="{% url 'collection_start_text' collection.id %}">Text Annotation Portal</a>
+             {% endif %}
+             {% if collection.has_images %}
+             <a class="dropdown-item" href="{% url 'collection_start_images' collection.id %}">Images Annotation Portal</a>
+             {% endif %}
+         </div>
+     </div>
+     {% endif %}
+     {% endif %}
+
+  </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+     {% if collection.entity_set.all %}
+
+     <table style='margin-top:10px' id="entities_table" class="mdl-data-table" style="width:100%;margin:0px;padding:0px" cellspacing="0" width="100%">
+         <thead>
+             <tr>
+                 <th>Active</th>
+                 <th>Name</th>
+                 <th>Images</th>
+                 <th>Text</th>
+             </tr>
+         </thead>
+         <tbody>
+             {% for entity in collection.entity_set.all %}
+             <tr>
+                 <td>
+                    {% if request.user == collection.owner %}
+                    <label class="switch">
+                        {% if entity.active == True %}
+                        <input class="entity-change-status" type="checkbox" data-id="{{ entity.id }}" checked>
+                        {% else %}
+                        <input class="entity-change-status" type="checkbox" data-id="{{ entity.id }}">
+                        {% endif %}
+                        <div class="slider round"></div>
+                    </label><br>
+                    {% else %}
+                        {% if entity.active %}
+                        <button class="btn btn-success btn-sm">Active</button>
+                        {% else %}
+                        <button class="btn btn-secondary btn-sm">Inactive</button>
+                        {% endif %}
+                    {% endif %}
+                 </td>
+                 <td><a href="#">{{ entity.uid }}</a></td>
+                 <td>{{ entity.image_entity.count }}</td>
+                 <td>{{ entity.text_entity.count }}</td>
+             </tr>
+             {% endfor %}
+          </tbody>
+       </table>
+       {% else %}
+       <p class="alert alert-info" style="margin-top:20px;width:100%">This collection does not have any entities! Why don't you try uploading some?</p>
+       {% endif %}
+     </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="btn-group dropup" style='float:right;padding-top:20px'>
+        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Delete</button>
+            <div class="dropdown-menu">
+                {% if collection.entity_set.count > 0 %}
+                <a class="dropdown-item" href="{% url 'delete_collection_entities' collection.id %}">Delete All Entities</a>
+                {% endif %}
+                <a class="dropdown-item" href="{% url 'delete_collection' collection.id %}">Delete Collection</a>
+           </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static "js/cookie-token.js" %}"></script>
+{% include "style/datatable.html" %}
+<script>
+$(document).ready(function() {
+
+    $('#entities_table').DataTable({
+
+         columnDefs: [
+            {
+                targets: [ 0, 1, 2, 3  ],
+                className: 'mdl-data-table__cell--non-numeric'
+            }
+        ],
+
+        "columns": [
+           { "width": "25%" },
+           { "width": "25%" },
+           { "width": "25%" },
+           { "width": "55%" }
+        ]
+
+    });
+
+    // On change on input, submit form
+    $(".entity-change-status").change(function(){
+        
+       var entity_id = $(this).attr('data-id');
+
+       $.ajax({
+            url : "/entity/" + entity_id + "/update/status", // the endpoint
+            type : "POST", // http method
+
+            // handle a successful response
+            success : function(json) {
+                console.log(json); // log the returned json to the console
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                    " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+       });
+
+    });
+
+    // Enable tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Tweak pagination
+    $("#entities_table_previous").text("<<")
+    $("#entities_table_next").text(">>")
+
+    {% if collection.description %}
+    // Add collection description
+        $("#sidebar-div").append('<p style="margin-top:160px" class="alert alert-info">{{ collection.description }}</p>');
+    {% endif %}
+});
+</script>
+{% endblock %}

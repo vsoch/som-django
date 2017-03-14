@@ -1,0 +1,92 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load humanize %}
+{% block css %}
+<style>
+.pagination {
+  padding-top:30px !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'messages/message.html' %}
+<div class="row">
+    <div class="col-md-12">
+
+         <h2 style="padding-bottom:20px">Users</h2>
+         {% if not users %}
+         <p>WordFish does not have any users! Why don't you <a href="{% url 'login' %}">sign up?</p>
+         {% else %}
+        
+         <table id="users" class="mdl-data-table" cellspacing="0" width="100%" style="padding-top:20px"> 
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Team</th>
+                    <th>Annotations</th>
+                    <th>Gils Earned</th>
+                    <th>Gils Spent</th>
+                    <th>Snacks</th>
+               </tr>
+           </thead>
+           <tbody>
+           {% for user in users %}
+               <tr>
+                   <td><a href="{% url 'user_snacks' user.id %}">{{ user.name }}</a></td>
+                   <td><a href="{% url 'team_details' user.team.id %}">{{ user.team.name }}</a></td>
+                   <td>{{ user.count }}</td>
+                   <td>{{ user.snacks.gils_earned }}</td>
+                   <td>{{ user.snacks.gils_spent }}</td>
+                   <td>{{ user.snacks.snacks.count }}</td>                   
+               </tr>
+          {% endfor %}
+          </tbody>
+          </table>
+         {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% include "style/datatable.html" %}
+<style>
+.mdl-grid {
+   padding-bottom:20px !important;
+}
+</style>
+<script>
+$(document).ready(function() {
+
+  // Enable tooltips
+  $('[data-toggle="tooltip"]').tooltip();
+
+
+  $('#users').dataTable({
+    "columns": [
+      { "width": "30%" },
+      { "width": "30%" },
+      { "width": "10%" },
+      { "width": "10%" },
+      { "width": "10%" },
+      { "width": "10%" },
+    ],
+    "pageLength": 25,
+        columnDefs: [
+            {
+                targets: [ 0, 1, 2, 3, 4, 5 ],
+                className: 'mdl-data-table__cell--non-numeric'
+            }
+        ]
+  });
+
+    // Tweak pagination
+    $("#users_previous").text("<<")
+    $("#users_next").text(">>")
+
+
+});
+
+</script>
+{% endblock %}

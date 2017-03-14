@@ -1,0 +1,53 @@
+<div class="col-md-3" id="sidebar-div">
+
+    <div class="widget-wrapper">
+        <div class="list-group">
+            <a class="list-group-item" href="{% url 'collections' %}">Collections</a>
+            <a class="list-group-item" href="{% url 'snacks' %}">Snacks</a>
+        </div>
+    </div>
+
+   <div id="modal-progress" style="display:none">
+       <h4 class="modal-title">Uploading...</h4>
+       <div class="progress">
+           <div class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+       </div>
+   </div>
+
+    {% if download_sidebar %}
+    <div class="widget-wrapper" style="min-height:190px;
+                                       background-color:#2e2e2e;
+                                       border-radius:5px;
+                                       padding:15px;
+                                       border:none">
+
+    <h4 style="color:white;font-weight:600">Access Data</h4><br>
+        <a id="db-button" style="cursor:pointer;padding-right:10px;color:#2196F3"><i class="fa fa-2x fa-database"></i></a>
+        <a style="cursor:pointer;color:#2BBBAD"><i class="fa fa-2x fa-code"></i></a>
+        <br><br>
+        <script>
+        var dbbutton = document.getElementById("db-button")
+        dbbutton.onclick = function(){
+            toggle("#dbpanel");
+        };
+        </script>
+        <div class="card hidden" style="display:none" id="dbpanel">
+            <div class="card-block">
+                    <strong>Request Data Access</strong>
+                    <div class="md-form">
+                        <i class="fa fa-user prefix"></i>
+                        <input type="text" id="form1" class="form-control">
+                        <label for="form1">Your name</label>
+                    </div>
+                    <div class="md-form">
+                        <i class="fa fa-envelope prefix"></i>
+                            <input type="text" id="form2" class="form-control">
+                            <label for="form2">Your email</label>
+                    </div>
+                    <button class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    </div>

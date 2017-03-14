@@ -1,0 +1,123 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static "css/social-auth.css"%}">
+<style>
+.fish-step {
+border-radius:20px; 
+height:250px;
+padding:20px;
+text-align: center;
+cursor:pointer;
+}
+.fish-text {
+color:white;
+font-size:20px;
+font-weight:600;
+margin-bottom:10px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        {% if user and not user.is_anonymous %}
+        <h3> Hello, {{ user.get_full_name }}!</h3>
+        <h4>WordFish is a platform for markup and annotation of text and images.</h4>  
+    </div>
+</div>
+
+<div class="row" style="padding-top:50px; padding-bottom:50px">
+    <div class="col-md-4">
+        <div class="fish-step" id="label" style="background-color:#0275d8">
+            <i class="fa fa-pencil-square" style="font-size:200px;color:white"></i>
+            <p class="fish-text">Label</p><br>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="fish-step" id="snacks" style="background-color:crimson">
+            <i class="fa fa-cutlery" style="font-size:200px;color:white"></i>
+            <p class="fish-text">Earn Snacks!</p><br>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="fish-step" id="discovery" style="background-color:lightseagreen">
+            <i class="fa fa-heart-o" style="font-size:200px;color:white"></i>
+            <p class="fish-text">Enable Discovery</p><br>
+       </div>
+    </div>
+</div>
+
+
+<div class="row" style="padding-top:10px;">
+    <div class="col-md-12">
+       <p id="info" style="display:none; font-size:16px; padding:20px; border-radius:5px; background-color:#F7F7F7">
+       </p>
+
+    <button style='margin-top:100px' class="btn btn-secondary btn-lg" id="show-flow">The Fish Flow</button>
+    <a href="{% url 'collections' %}"><button style='margin-top:100px;float:right' class="btn btn-lg btn-warning">Start</button></a>
+    </div>
+</div>
+
+<div class="row" style='display:none' id='flow'>
+    <div class="col-md-12" style="padding-top:100px">
+
+        <h3 id="flowtop">The Fish Flow</h3>
+
+         <p style="margin-bottom:50px">Are you new to WordFish? Select an option from the standard flow of research to get started, or dive right in and go to <a href="{% url 'my_collections' %}">your collections.</a></p>
+             <a href="/guide#images-and-text"><button class="btn btn-lg btn-secondary" style="margin-right:10px;margin-left:10px">Images and Text</button></a>
+                 <i class="fa fa-arrow-right fa-2x"></i>
+             <a href="/guide#labels-and-markup"><button class="btn btn-lg btn-secondary" style="margin-right:10px;margin-left:10px">Labels and Markup</button></a>
+                 <i class="fa fa-arrow-right fa-2x"></i>
+             <a href="/guide#machine-learning"><button class="btn btn-lg btn-secondary" style="margin-right:10px;margin-left:10px">Machine Learning</button></a>
+                 <i class="fa fa-arrow-right fa-2x"></i>
+             <a href="/guide#discovery"><button class="btn btn-lg btn-secondary" style='margin-left:10px'>Discovery</button></a>
+        </p><br>
+    </div>
+    {% else %}
+
+    <div class="login-box">
+        <a class="social-button" id="twitter-connect" href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}">Login with Twitter</a>
+        <a class="social-button" id="google-connect" href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Login with Google</a>
+        <!--<a class="social-button" id="github-connect" href="{% url 'social:begin' 'github' %}?next={{ request.path }}">Login with Github</a>-->
+    {% endif %}
+    </div>
+
+
+</div>
+{% block scripts %}
+<script>
+$(document).ready(function(){
+
+   $('#label').click(function(){
+       $("#info").html('WordFish is a platform for markup and annotation of images and text. That means that you might be drawing, pointing, or labeling. We store your annotations and markups as images and text, and make them programmatically available to researchers and scientists.')
+       $("#info").show()
+   })
+
+   $('#snacks').click(function(){
+       $("#info").html("WordFish like snacks. We think that you probably like snacks too. For each annotation that you do, you earn a gil, which is a unit of fish currency toward a snack. We have a database of over 75,000 snacks that you can explore and add your favorites to your SnackBox. For each 1000 gils that you earn, WordFish will let you request a snack. WordFish will deliver, by mail or fish foot, your snack to you!")
+       $("#info").show()       
+   })
+
+   $('#discovery').click(function(){
+       $("#info").html("These annotations and markup are essential tasks to derive datasets for machine learning for discovery in science and medicine. For some collections of images and text that you help with, the owner will even give you authorship on their work. We are working together for a better tomorrow.")
+       $("#info").show()              
+   })
+
+   $("#show-flow").click(function(){
+      $("#flow").toggle();
+      document.location="#flowtop"
+   })
+
+
+})
+</script>
+{% endblock %}
+{% endblock %}
+{% block footer %}
+{% include 'main/footer.html' %}
+{% endblock %}

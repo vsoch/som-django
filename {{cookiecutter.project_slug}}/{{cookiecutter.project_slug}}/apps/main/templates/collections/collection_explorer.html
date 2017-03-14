@@ -1,0 +1,109 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% block css %}
+<script type="text/javascript">
+    document.write('<style type="text/css">.menu-tree-preloader { display:block; } .menu-tree { display:none; }</style>');
+</script>
+<script src="{% static "js/codemirror.js" %}"></script>
+<link rel="stylesheet" href="{% static "css/codemirror.css" %}" rel='stylesheet' type='text/css'>
+<link href="{% static "css/dataset_explorer.css" %}" rel='stylesheet' type='text/css'>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-3">
+            <h2>Collection Explorer</h2>
+                <p class="alert alert-info"><a href="{% url 'collection_details' collection.id %}">{{ collection.name }}</a></p>
+                <div class="menu-tree-container">
+                    <div class="menu-tree-preloader">
+                        <img src="{% static "img/preload.gif" %}">
+                    </div>
+                    <div class="menu-tree">
+                    <ul>
+                    {% for entity in collection.entity_set.all %}
+                        <li>{{ entity.uid }}  
+                        {% if entity.image_entity.count > 0 or entity.text_entity.count > 0 %}
+                            <ul>
+                            {% for image in entity.image_entity.all %}
+                                <li>{{ image.uid }}
+                                <ul>
+                                    <li><a class="image" data-url="{{ image.original.url }}">{{ image.get_file_name }}</a></li>
+                                    {% if image.metadata %}
+                                    <li><a class="json" data-url="{% url 'serve_image_metadata' image.id %}">metadata.json</a></li>
+                                    {% endif %}
+                                </ul>
+                                </li>
+                            {% endfor %}
+                            {% for text in entity.text_entity.all %}
+                                <li>{{ text.uid }}
+                                <ul>
+                                    <li><a class="txt" data-url="{% url 'serve_text' text.id %}">{{ text.get_file_name }}</a></li>
+                                    {% if text.metadata %}
+                                    <li><a class="json" data-url="{% url 'serve_text_metadata' text.id %}">metadata.json</a></li>
+                                    {% endif %}
+                                {% if forloop.last %}
+                                </ul>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                    {% if collection.metadata %}
+                    <li><a href="{{ collection.metadata }}">metadata</a></li>
+                    {% endif %}
+                    </div>
+                </div>
+        </div>
+        <div class="col-md-9">
+          <div id='content'></div>
+        </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static "js/dataset_explorer.js" %}"></script>
+<script>
+        $(document).ready(function(){
+
+          // Clicking an image shows it. Right now we assume png
+          $('.image').click(function(){
+              var file = $(this).attr('data-url');
+              console.log(file);
+              // In future can use this to change display of image type
+              var extension = file.substr((file.lastIndexOf('.') +1));
+              $("#content").text("");
+              $("#content").append("<img src='" + file + "' width='100%'>");
+          })
+
+          $('.json').click(function(){
+              var file = $(this).attr('data-url');
+              console.log(file);
+              $("#content").text("");
+              $("#content").append('<textarea id="editor"></textarea>');
+              var textarea = document.getElementById('editor');
+              $.getJSON(file, function( data ) {
+                  var editor = CodeMirror.fromTextArea('editor', {
+                      height: "600px",
+                      mode: "application/ld+json",
+                      lineWrapping: true,
+                      parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
+                      content: JSON.stringify(data,null,2),
+                      stylesheet: "{% static "css/jscolors.css" %}",
+                      path: "{% static "js/" %}"
+                  })
+              })
+          })
+
+          $('.txt').click(function(){
+              var file = $(this).attr('data-url');
+              console.log(file);
+              $("#content").text("");
+              $.getJSON(file, function( data ) {
+                  $("#content").append('<textarea id="editor" style="width:100%;margin-top:100px">' + data.original+'</textarea>');
+              })
+          })
+        })
+</script>
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load dictionary_extras %}
+{% load staticfiles %}
+{% load humanize %}
+{% block head %}
+{% endblock %}
+{% block css %}
+
+<style>
+.active {
+  background-color:#0275d8 !important;
+  border: none !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'messages/message.html' %}
+{% include 'base/loader.html' %}
+
+<div class="row">
+    <div class="col-md-6">
+        <p id="som_image">{{ text.original }}</p>
+    </div>
+    <div class="col-md-6">
+
+        <!-- Form to send updates to server-->
+        <form action="{% url 'update_text_annotation' text.id %}" method="POST" id="update_text_annotation">
+        {% csrf_token %}
+        {% for name,labels in allowed_annotations.items %}
+            <fieldset style="border:dashed 1px;margin-bottom:10px">
+                <legend style="width:0%;font-size:1em;margin-bottom:0px"><span style="background-color:white">{{ name }}</span></legend>
+                <div class="btn-group" data-toggle="buttons">
+                    {% for label in labels %}
+                        {% if name in annotations and annotations|access:name == label %}
+                        <label class="btn btn-secondary annotate-button active">
+                        {% else %}
+                        <label style="border:none;" class="btn btn-secondary annotate-button">                    
+                        {% endif %}
+                        <input class="annotate-button" type="radio" name="{{ name }}||{{ label }}" id="{{ label }}" autocomplete="off"> {{ label }}
+                        </label>
+                    {% endfor %}
+                 </div>
+             </fieldset>
+        {% endfor %}
+        </form>
+
+        <div class="button-group">
+            <button id="skip_button" class="btn btn-primary"> >> </button>
+        </div>
+
+        
+        </div> 
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div style="padding-left:60px">
+             <span style="color:#CCC">{{ text.uid }}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static "js/cookie-token.js" %}"></script>
+<script type='text/javascript'>
+$(function() {
+
+    // Left and right arrow keys navigate as well
+    $(document).keydown(function(e) {
+
+        if (e.which == 37) { 
+            history.back();
+            e.preventDefault();
+            return false;
+         }
+        
+        if (e.which == 39) { 
+           document.location = "{% url 'collection_annotate_text' collection.id %}"
+           e.preventDefault();
+           return false;
+        }
+    });
+
+    // Function to push an annotation change
+    function pushAnnotation() {
+
+        // Use promises to ensure that data is serialized before sending to server
+        var promise = new Promise(function(resolve, reject) {
+            var annotations = JSON.stringify($("#update_text_annotation").serializeArray())
+            return resolve(annotations);
+            
+        }).then(function(annotations){
+            console.log(annotations);
+            $.ajax({
+                url : "{% url 'update_text_annotation' text.id %}", // the endpoint
+                type : "POST", // http method
+                data : { annotations: annotations }, // data sent with the post request
+
+                // handle a successful response
+                success : function(json) {
+                    console.log(json); // log the returned json to the console
+                    console.log("success"); // another sanity check
+                },
+
+                // handle a non-successful response
+                error : function(xhr,errmsg,err) {
+                    $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                }
+             });
+
+        })
+    }
+
+    // Function to clear annotations
+    function clearAnnotations() {
+
+        $.ajax({
+            url : "{% url 'clear_text_annotations' text.id %}", // the endpoint
+            type : "POST", // http method
+
+            // handle a successful response
+            success : function(json) {
+                console.log(json); // log the returned json to the console
+                console.log("success"); // another sanity check
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                    " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                     console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+         });
+    }
+
+
+   $(".annotate-button").click(function(){
+       if ($(this).hasClass('active')){
+           $(this).addClass('active');
+       } else {
+          $(this).removeClass('active');
+       }
+        setTimeout(function(){
+             pushAnnotation();
+        },500)
+   })
+ 
+  // On click, clear annotations
+    $("#clear_button").click(function(){
+        setTimeout(function(){
+             clearAnnotations();
+        },500)
+        $('input:radio').attr('checked',false)
+        $('.annotate-button').removeClass('active');
+    });
+
+
+   $("#skip_button").click(function(){
+       document.location = "{% url 'collection_annotate_text' collection.id %}"
+   });
+})
+</script>
+{% endblock %}

@@ -1,0 +1,99 @@
+body {
+          font-family: 'Roboto', sans-serif;
+      }
+
+.massive {
+	font-size: 50px;
+	padding: 10px 0px 50px 0px;
+	line-height: 1em;
+	font-family: "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
+	text-align: center;
+}
+
+.third {
+	width: 33%;
+}
+
+
+.slice {
+	float: left;
+	font-size: 20px;
+	font-family: "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
+	line-height: 1.3em;
+	padding: 20px 15px 20px 35px;
+}
+
+.light-head {
+	font-size: 36px;
+	font-family: "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
+	line-height: 1.4em;
+	margin-bottom: 10px;
+}
+
+.small-light-head {
+	font-size: 26px;
+	font-family: "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
+	line-height: 1.4em;
+}
+
+.center-text {
+	text-align: center;
+}
+.management-options {
+	clear: both;
+	padding-bottom: 30px;
+}
+
+.management-options .btn {
+	font-size: 18px;
+	font-family: "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
+	padding: 11px;
+}
+
+.float-right-wrapper {
+  float: right;
+}
+
+.btn-cogat {
+  color: #fff;
+  background-color: #1abc9c;
+  border-color: #1abc9c;
+}
+
+#navbar .navbar-brand {
+  font-size: 1.8em;
+  color: #442C50;
+}
+
+/* Buttons */
+
+.btn-big {
+  margin-left:10px !important;
+  position:relative !important;
+  top:-10px !important;
+  font-size:35px !important;
+  height:80px !important;
+}
+
+.salmon-text {
+  color: lightsalmon
+}
+
+.salmon-bg {
+  background-color:lightsalmon;
+}
+
+/* Modals */
+
+.behavioral-modal-content {
+    width: 800px;
+    padding-left: 20px;
+}
+
+.behavioral-modal-dialog {
+    width: 800px;
+}
+
+#editbehavior {
+    padding-top: 100px;
+}

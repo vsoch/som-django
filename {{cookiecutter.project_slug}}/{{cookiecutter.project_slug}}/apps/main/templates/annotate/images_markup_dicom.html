@@ -1,0 +1,187 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load humanize %}
+{% block head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+{% endblock %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static "css/papaya.css" %}" />
+
+<script type="text/javascript">
+var params = {
+                "orthogonal": false, 
+                "mainView": "axial", 
+                "fullScreenPadding": false,
+                "kioskMode": true, 
+                "worldSpace": true, 
+                "smoothDisplay": false, 
+                "showControls": false,
+                "allowScroll": false,
+                "showImageButtons": false, 
+                "showOrientation": false,
+                "images": ["{{ image.original.url }}"]
+             }
+</script>
+<script type="text/javascript" src="{% static "js/papaya.js" %}"></script>
+<style>
+.outside_wrapper{ 
+    width:770px; height:822px; 
+    margin:20px 60px; 
+    border:0px solid transparent;
+    box-sizing: none !important;
+}
+.inside_wrapper{ 
+    width:100%; height:100%; 
+    position:relative;
+    background-color: blue;
+    box-sizing: none !important;
+}
+.som_image{ 
+    width:100%; height:100%; 
+    position:absolute; top:0px; left:0px;
+    box-sizing: none !important;
+}
+#previous_overlay{ 
+    width:100%; height:100%; 
+    position:absolute; top:0px; left:0px;
+    box-sizing: none !important;
+    background: rgba(76, 175, 80, 0.3);
+}
+#som_sketch{ 
+    width:100%; height:100%; 
+    position:absolute; top:0px; left:0px;
+    box-sizing: none !important;
+}
+#tools {
+    padding-left:100px;
+    padding-top:20px;
+}
+.button {
+    cursor: pointer;
+}
+.button:hover{
+    color: purple;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'messages/message.html' %}
+{% include 'base/loader.html' %}
+
+<div class="row">
+
+     <span id="tools"></span>
+     <span style="padding-left:320px;margin-top:20px">
+         <button id="clear_button" class="btn btn-xs btn-warning">Clear</button>
+         <button id="save_button" class="btn btn btn-xs btn-primary">Save</button>
+         <button id="skip_button" class="btn btn btn-xs btn-primary">Skip</button>
+    </span>
+</div>
+
+{% if markup.overlay %}
+<div class="row" style="padding-top:20px">
+    <div class="col-md-12">
+        <div id='warning' class="alert alert-warning" style="margin-left:60px; width:768px;padding-top:5px; padding-bottom:5px">Warning: you have previously annotated this image. Saving will overwrite it. <button style="margin-bottom:5px" class="btn btn-warning btn-xs" id="previous_overlay_button">Toggle</button></div>
+    </div>
+</div>
+{% endif %}
+
+    <div class="outside_wrapper">
+        <div class="inside_wrapper">
+            <div class="papaya som_image" data-params="params" style="height: 100%; width: 100%; margin: 0px; padding: 0px"></div>
+            <canvas id='som_sketch' width='770' height='822' style="border: 0px solid transparent;"></canvas>
+            <img id="previous_overlay" src="{{ markup.overlay.url | safe }}" style='display:none'>
+        </div>
+    </div>
+     <div style="padding-left:60px">
+         <span style="color:#CCC;padding-right:200px">{{ image.uid }}</span>
+         <button id="preview_button" class="btn btn-xs btn-warning">Preview</button>
+    </div>
+
+    <!-- Hidden form to send image markup to server -->
+    <form id="save_markup" class="form-horizontal" method="post" action="{% url 'markup_image' collection.id image.id %}" >
+        <input type="hidden" name="image_id" value="{{ image.id }}">  
+        <input type="hidden" name="pngdata" id="hidden_image">  
+        {% if missing_base %}
+        <input type="hidden" name="pngdatabase" id="base_image">  
+        {% endif %}
+
+        {% csrf_token %}
+    </form>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static "js/sketch.js" %}"></script>
+<script type='text/javascript'>
+$(function() {
+
+    $.each(['#FF0000','#EB5E94','#073AB1', '#378B2E', 'yellow', '#000', '#fff'], function() {
+          $('#tools').append("<a href='#som_sketch' data-color='" + this + "' style='border: 1px solid black; width: 30px; height: 30px; background: " + this + "; display: inline-block;'></a> ");
+        });
+   });
+
+   // Hold this guy around
+   var handle = $('#som_sketch').sketch();
+
+   {% if markup.overlay %}
+   //var imageObj = new Image();
+   //imageObj.src = '{{ markup.overlay.url | safe }}';
+   $("#previous_overlay_button").click(function(){
+       $("#previous_overlay").toggle();
+   })
+   //    var context = handle.sketch().canvas.get(0).getContext('2d');
+   //    var canvas = handle.sketch().canvas[0]
+   //    imageObj.onload = context.drawImage(imageObj,0,0)
+
+   {% endif %}
+ 
+   // Remove the crosshairs
+   setTimeout(function(){
+     papayaContainers[0].preferences.updatePreference("showCrosshairs","No")
+   }, 500)
+
+   // Convert canvas to png data to send to server
+   function convertCanvasToImage(canvas) {
+     var image = new Image();
+     image.src = canvas.toDataURL("image/png");
+     return image;
+   }
+
+   // Save button sends markup to server
+   $("#save_button").click(function(){
+       var canvas = $("#som_sketch");
+       var imageData = canvas[0].toDataURL('image/png');
+       $("#hidden_image").attr("value", imageData);
+
+       {% if missing_base %}
+       var baseImage = $(".som_image canvas")[0].toDataURL('2d');
+       $("#base_image").attr("value", baseImage);
+       {% endif %}
+
+       $("#save_markup").submit();
+   });
+
+   // Open new window with png when user saves
+   $("#preview_button").click(function(){
+       handle.sketch().download('png');
+   })
+
+   $("#clear_button").click(function(){
+       handle[0].getContext('2d').clearRect(0,0,1920,2000);
+       handle = $('#som_sketch').sketch('actions',[]);
+       //handle.sketch().clear()
+   })
+
+
+   $("#skip_button").click(function(){
+       document.location = "{% url 'collection_markup_image' collection.id %}"
+   });
+
+</script>
+{% endblock %}

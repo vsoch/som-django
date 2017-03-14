@@ -1,0 +1,70 @@
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% block content %}
+{% include 'main/message.html' %}
+{% include 'main/loader.html' %}
+
+<div class="card">
+    <div class="card-block">
+
+        <!--Header-->
+        <div class="text-xs-center">
+            <h3>Bulk Annotation</h3>
+            <hr class="mt-2 mb-2">
+        </div>
+
+        <form action="" method="POST">
+
+            {% csrf_token %}
+
+            <!-- Annotations -->
+            {% for name,allowed in allowed_annotations.items %}
+               <h4 style="color:#d9534f">{{ name }}</h4>
+
+               <select name="whatisit||{{name}}" class="mdb-select colorful-select dropdown-primary">
+                <option value=""></option>
+                {% for allowed_annotation in allowed %}   
+                <option value="{{ allowed_annotation }}">{{ allowed_annotation }}</option>
+               {% endfor %}
+               </select>
+               
+            {% endfor %}
+
+            <!-- Apply to all reports? -->
+           <fieldset class="form-group">
+               <input type="checkbox" class="filled-in" name="unlabeled_only" id="unlabeled_only" checked>
+               <label for="unlabeled_only">Apply to unlabeled only</label>
+           </fieldset>
+
+            <div class="text-xs-center">
+                <button id="submit_button" type="submit" class="btn btn-primary">Apply Annotation</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+ $(document).ready(function() {
+    $('.mdb-select').material_select();
+    {% if sid %}
+        var url = "{% url 'bulk_annotate' collection.id sid %}"
+    {% else %}
+        var url = "{% url 'bulk_annotate' collection.id %}"
+    {% endif %}
+    $("form").attr("action",url);
+
+   // Show {{cookiecutter.project_slug}} when clicks time intensive action
+   $('#submit_button').click(function() {
+      $("#fade").show();
+      $('#loadfish').show();
+      return true;
+   });
+
+  });
+</script>
+{% endblock %}

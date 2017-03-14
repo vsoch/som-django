@@ -1,0 +1,42 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+{% block head %}
+<style>
+.card {
+  cursor: pointer;
+}
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <h1>WordFish at Stanford</h1>
+
+        <p>Hello! WordFish is a general text and image annotation and markup tool developed for Stanford University and the School of Medicine. Please reach out to our main developer, or to the <a href="http://langlotzlab.stanford.edu" target="_blank">Langlotzlab</a> if you have any questions.</p>
+
+	<div style="margin-top:50px">
+            <div class="card" id="vcard">
+		<div class="card-block">
+		<h4 class="card-title">Vanessa Sochat</h4>
+		<p class="card-text">Research Software Engineer for Stanford Medicine</p>
+                <p class="card-text">
+		    <a target="_blank" href="https://vsoch.github.io/"><i class="fa fa-home"></i></a>
+		    <a target="_blank" href="http://www.twitter.com/vsoch"><i class="fa fa-twitter"></i></a>
+		    <a target="_blank" href="http://www.github.com/vsoch"><i class="fa fa-github"></i></a>
+                </p>
+	    </div>
+	</div>
+    </div>           
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function(){
+    $("#vcard").click(function(){
+        document.location = 'https://vsoch.github.io'
+    })
+})
+</script>
+{% endblock %}

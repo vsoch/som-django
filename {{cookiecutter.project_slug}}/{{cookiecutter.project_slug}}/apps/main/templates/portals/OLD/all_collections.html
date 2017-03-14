@@ -1,0 +1,107 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+
+        <h2>WordFish Collections</h2>
+        <p>Images and Text</p>
+
+        <div class="social-counters">
+            <a href="{% url 'new_collection' %}" data-toggle="tooltip" 
+            data-placement="bottom"><button class="btn btn-primary">
+            New Collection</button></a>                 
+            {% if collections %} 
+            <span class="counter">
+                <span id="show_collection_description" style="color:white"><strong>?</strong></span>
+            </span>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+            {% if page_title == "My Collections" %}
+            <a href="{% url 'collections' %}"><button class="btn btn-primary">All Collections</button></a>
+            {% endif %}
+            {% if page_title == "Collections" %}
+            <a href="{% url 'my_collections' %}"><button class="btn btn-primary">My Collections</button></a>
+            {% endif %}
+            {% endif %}
+
+            {% if not collections %}
+            <div class="excerpt">
+            {% else %}
+            <script>
+            var cdbutton = document.getElementById("show_collection_description")
+                cdbutton.onclick = function(){
+                toggle("#collection_description");
+            };
+            </script>
+
+            <div class="excerpt hidden" id='collection_description' style="display:none">
+            {% endif %}
+            <p style='padding-top:20px'>A collection is a grouping of entities, each of which can have images and text. If you have a machine learning project with text or images, you can make a collection. If you have a clinical annotation task with text and images, that fits into a collection too.
+            </p>
+
+            <p>You can use collections to control permissions and distribution of your data. A collection that is open to public annotation will allow for contribution from others, while a closed collection will not.</p>
+        </div>
+    </div>
+    </div>
+</div>
+<br>
+
+<div class="row">
+    <div class="col-md-12">                       
+       {% if collections %}
+               <table id="collections_table" class="mdl-data-table" cellspacing="0" width="100%" style="padding-top:20px">
+                       <thead>
+                           <tr>
+                               <th>Name</th>
+                               <th>Owner</th>
+                               <th>Entities</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                       {% for collection in collections %}
+                       <tr>
+                           <td><a href="{% url 'collection_details' collection.id %}">{{ collection.name }}</a></td>
+                           <td>{{ collection.owner }}</td>
+                           <td>{{ collection.entity_set.count }}</td>
+                       </tr>
+                       {% endfor %}
+                     </tbody>
+                     </table>
+                    {% endif %}
+               </div>
+            </div>
+    </div>
+{% endblock %}
+    </div>
+</div>
+
+{% block scripts %}
+{% include "style/datatable.html" %}
+<style>
+.mdl-grid {
+   padding-bottom:20px !important;
+}
+</style>
+<script>
+$(document).ready(function() {
+
+     $('#collections_table').DataTable( {
+        columnDefs: [
+            {
+                targets: [ 0, 1, 2 ],
+                className: 'mdl-data-table__cell--non-numeric'
+            }
+        ]
+    } );
+
+    // Enable tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+});
+</script>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "main/base.html" %}
+{% load staticfiles %}
+{% load dictionary_extras %}
+{% block head %}
+{% endblock %}
+{% block content %}
+<style>
+.annotate-button{
+  background-color:white !important;
+  color:#333 !important; 
+  box-shadow:none !important;
+}
+.btn-primary.active{
+  color: white !important;
+}
+#annots {
+  background-color:white;
+  border-radius:10px;
+}
+.arrow{
+  width:200px;
+  height:50px;
+  color:#0b51c5;
+  font-size:30px;
+  cursor:pointer;
+}
+.arrow:hover{
+  color:#F3F3F3;
+}
+</style>
+<div class="container">
+    <div id="annots">
+    
+    <!-- Display error messages to user -->
+    <div class="row" id="results"></div>
+
+    <div class="row" style="padding-bottom:50px;" id="annots-row">
+        <div class="col-md-12">
+
+        {% include "main/message.html" %}
+
+        <!-- Form to send updates to server-->
+        <form id="testing_form" action="{% url 'test_annotator' sid report.id %}" method="POST">
+
+        {% csrf_token %}
+        {% for name,labels in allowed_annotations.items %}
+            <fieldset style="border:dashed 1px;margin-bottom:10px">
+                <legend style="width:0%;font-size:1em;margin-bottom:0px"><span style="background-color:white">{{ name }}</span></legend>
+                <div class="btn-group" data-toggle="buttons">
+                    {% for label in labels %}
+                        {% if name in annotations and annotations|access:name == label %}
+                        <label class="btn btn-primary annotate-button active">
+                        {% else %}
+                        <label class="btn btn-primary annotate-button">                    
+                        {% endif %}
+                        <input class="annotate-button" type="radio" name="{{ name }}||{{ label }}" id="{{ label }}" autocomplete="off"> {{ label }}
+                        </label>
+                    {% endfor %}
+                 </div>
+             </fieldset>
+        {% endfor %}
+
+        </form>
+
+        </div>
+    </div>
+    </div>
+
+    {% if annotate_permission %}
+    <div class="row">
+        <div class="col-md-12">
+            <h2 style="margin-bottom:50px;color:#0275d8">{{ collection.name }}/{{ report.report_id }}</h2>
+            <div class="card card-block">
+                <p id="markme">{{ report.report_text }}</p>
+            </div>
+        </div>
+    </div>     
+    <div class="row" style='padding-top:25px'>
+        <div class="col-md-12">
+            <a id="next-one"><div class="arrow" style="float:right;text-align:right" type="button"><i class="fa fa-chevron-right fa-2x"></i></div></a>
+        </div>
+    </div>     
+    {% else %}
+    <div class="row">
+        <div class="col-md-12">
+            <a><h2 style="margin-bottom:50px">{{ collection.name }}/{{ report.report_id }}</h2></a>
+
+        {% if membership %}
+        <p class="alert alert-info">Your annotator request submit on {{ membership.created_at }} has status {{ membership.status }}.</p>
+        {% else %}
+        You don't have permission to annotate this collection. Please <a href="{% url 'request_annotate_permission' report.collection.id %}"><button type="button" class="btn btn-lg btn-default waves-effect waves-light">request permission</button></a>
+        {% endif %}
+
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% include "annotate/controls.html" %}
+
+{% endblock %}
+{% block scripts %}
+<script src="{% static "js/cookie-token.js" %}"></script>
+<script src="{% static "js/jquery.sticky.js" %}"></script>
+<script src="{% static 'js/bootstrap-tagsinput.min.js'%}"></script>
+<script src="{% static "js/jquery.mark.min.js" %}"></script>
+
+{% include "annotate/highlight.html" %}
+
+<script>
+
+$(document).ready(function(){
+
+
+    // The annotations move down the page when we scroll
+    $("#annots").sticky({topSpacing:0,
+                         zIndex:100});
+
+    $('#annots').on('sticky-start', function() { 
+       $("#annots-row").css('padding-bottom','0px') 
+    });
+
+    $('#annots').on('sticky-end', function() { 
+       $("#annots-row").css('padding-bottom','50px') 
+    });
+
+    // Left and right arrow keys navigate as well
+    $(document).keydown(function(e) {
+
+        // User can only submit form to move on        
+        if (e.which == 39) { 
+           $("#testing_form").submit();
+           e.preventDefault();
+           return false;
+        }
+    });
+
+    // When the user clicks next, submit the form
+    $("#next-one").click(function(){
+        $("#testing_form").submit()
+    })
+
+    // Annotation tools
+    $("#tool-toggle").click(function(){
+        $("#tools").toggle();
+        if ($("#tool_direction").hasClass("fa-chevron-up")){
+            $("#tool_direction").removeClass("fa-chevron-up")
+            $("#tool_direction").addClass("fa-chevron-down")
+        } else {
+            $("#tool_direction").removeClass("fa-chevron-down")
+            $("#tool_direction").addClass("fa-chevron-up")
+        }
+    })
+
+});
+</script>
+{% endblock %}

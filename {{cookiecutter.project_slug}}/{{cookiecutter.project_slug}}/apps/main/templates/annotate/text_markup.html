@@ -1,0 +1,209 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load humanize %}
+{% block head %}
+{% endblock %}
+{% block css %}
+<style>
+.som_text {
+  text-rendering: optimizeLegibility;
+  cursor: e-resize;
+  border-radius:5px;
+  background: #F7F7F7;
+  margin-top:20px;
+  padding:20px 20px 0px 20px;
+  font-size:16px;
+  line-height:1.5;
+}
+.loggy:not(:empty) {
+  padding: 5px;
+  color: #000;
+}
+.loggy {
+  list-style: none;
+}
+.loggy li {
+  padding:5px;
+}
+
+.color-picker {
+    float: left;
+    display: block;
+    margin: 1px 0 5px;
+    text-align: left;
+}
+.color-picker div {
+    width: 20px;
+    height: 20px;
+    border-radius: 12px;
+    margin: 5px 5px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.color-picker div:hover {
+}
+
+.color-picker div.selected {
+    border: 2px solid #444;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'messages/message.html' %}
+{% include 'base/loader.html' %}
+
+<div class="row">
+    <div class="col-md-12">
+         <span id="tools"></span>
+         <span style="float:right;margin-top:20px">
+             <button id="clear_button" class="btn btn-xs btn-secondary">Clear</button>
+             <button id="save_button" class="btn btn btn-xs btn-secondary">Save</button>
+             <button id="skip_button" class="btn btn btn-xs btn-secondary">Skip</button>
+        </span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="som_text" style="padding-bottom:20px">{{ text.original }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3" style="margin-top:5px">
+        <span style="color:#CCC">{{ text.uid }}</span>
+    </div>
+    <div class="col-md-9 color-picker"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+    <div><ul class="loggy"></ul></div>
+    </div>
+</div>
+
+    <!-- Hidden form to send image markup to server -->
+    <form id="save_markup" class="form-horizontal" method="post" action="{% url 'markup_text' collection.id text.id %}" >
+        <input type="hidden" name="pngdata" id="hidden_image">  
+        {% if missing_base %}
+        <input type="hidden" name="pngdatabase" id="base_image">  
+        {% endif %}
+        {% csrf_token %}
+    </form>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static "js/ColorPicker.js" %}"></script>
+<script src="{% static "js/TextHighlighter.js" %}"></script>
+<script src="{% static "js/jquery.textHighlighter.js" %}"></script>
+<script src="{% static "js/cookie-token.js" %}"></script>
+<script type='text/javascript'>
+$(function() {
+
+    // Left and right arrow keys navigate as well
+    $(document).keydown(function(e) {
+
+        if (e.which == 37) { 
+            history.back();
+            e.preventDefault();
+            return false;
+         }
+        
+        if (e.which == 39) { 
+           document.location = "{% url 'collection_markup_text' collection.id %}"
+           e.preventDefault();
+           return false;
+        }
+    });
+
+   // We will save a list of highlights
+   {% if markup.locations|length > 0 %}
+   var highlights = [{{ markup.locations | safe }}]
+   {% else %}
+   var highlights = []
+   {% endif %}
+
+   function updateHighlights(text,bgcolor,startOffset,endOffset,timestamp){
+      loggy.append("<li style='background-color:" + bgcolor + ";background:" + bgcolor +"'>" + text + "</li>")
+      // Add the new highlight to our list
+      record = {'timestamp': timestamp,
+                'color': bgcolor,
+                'text': text,
+                'startOffset': startOffset,
+                'endOffset': endOffset }
+      highlights.push(record);
+   }
+
+
+   // We will save a list of highlights
+   {% if markup.locations|length > 0 %}
+       {% for hl in markup.locations %}
+       updateHighlights("{{ hl.text }}","{{ hl.color }}",{{ hl.startOffset }},{{ hl.endOffset }},{{ hl.timestamp }})
+       {% endfor %}
+   {% endif %}
+
+   var colors = new ColorPicker(document.querySelector('.color-picker')); 
+   var context = $(".som_text")[0];
+   var loggy = $(".loggy");
+   var hltr = new TextHighlighter(context, {
+        onBeforeHighlight: function (range) {
+            return true;
+        },
+        onAfterHighlight: function (range, hlts) {
+            var bgcolor = $('.color-picker').find('.selected').css('background-color');
+            updateHighlights(hlts[0].innerHTML,
+                             bgcolor,
+                             range.startOffset,
+                             range.endOffset,
+                             $(hlts[0]).attr('data-timestamp'))
+        },
+        onRemoveHighlight: function (hlt) {
+            return true;
+        }
+   });
+
+    function pushMarkup(serialized) {
+  
+        $.ajax({
+            url : "{% url 'update_text_markup' text.id %}", // the endpoint
+            type : "POST", // http method
+            data : { markup: serialized }, // data sent with the post request
+
+            success : function(json) {
+                console.log(json); // log the returned json to the console
+            },
+
+            error : function(xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+         });
+    }
+
+
+   $("#save_button").click(function(){
+       var promise = new Promise(function(resolve, reject) {
+           var serialized = JSON.stringify(highlights)     
+           return resolve(serialized);
+        }).then(function(serialized) {
+             pushMarkup(serialized)
+        })
+   })
+
+   colors.onColorChange(function (color) {
+       hltr.setColor(color);
+   });
+
+   $("#clear_button").click(function(){
+      hltr.removeHighlights();
+   })
+
+   $("#skip_button").click(function(){
+       document.location = "{% url 'collection_markup_text' collection.id %}"
+   });
+
+});
+</script>
+{% endblock %}

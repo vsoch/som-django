@@ -1,0 +1,74 @@
+{% load notifications_tags %}
+{% block header %}
+{% notifications_unread as unread_count %}
+
+<header>
+<div class="container-fluid bg-faded" {% if header_black %}style="background-color:black;"{% endif %}>
+   <nav class="navbar navbar-toggleable-md" style="padding-left:150px">
+       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+       </button>
+       <a class="navbar-brand" href="/">
+           <span{% if header_black %}style="color:lightblue;"{% else %}style='color:darkblue;'{% endif %}>Word</span>Fish</a>
+
+       <div class="collapse navbar-collapse" id="navbarSupportedContent">
+           <ul class="navbar-nav mr-auto">
+
+               <!-- Help and user guide-->
+               <li class="nav-item btn-group">
+                   <a class="nav-link dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                       <a class="dropdown-item" href="{% url 'about' %}">About</a>
+                       <a class="dropdown-item" href="{% url 'user_guide' %}">User Guide</a>
+                  </div>
+               </li>
+
+               <!-- Fish -->
+               <li class="nav-item btn-group">
+                   <a class="nav-link dropdown-toggle" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Community</a>
+                   <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                       <a class="dropdown-item" href="{% url 'teams' %}">Teams</a>      
+                       <a class="dropdown-item" href="{% url 'users' %}">Users</a>      
+                       <a class="dropdown-item" href="{% url 'snacks' %}">Snacks</a>      
+                  </div>
+               </li>
+
+               <li class="nav-item">
+                   <a class="nav-link" onclick='showFeedback()'>Feedback</a>
+               </li>
+           </ul>
+
+           <!--<form class="form-inline my-2 my-lg-0">
+               <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                   <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+           </form>-->
+
+
+               <ul class="nav navbar-nav pull-right">
+
+               {% if request.user.is_authenticated %}
+               <li class="nav-item btn-group">
+                   <a class="nav-link dropdown-toggle" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ request.user.username }}</a>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                       <a class="dropdown-item" href="{% url 'logout' %}">Logout <span class="sr-only">(current)</span></a>      
+                       <a class="dropdown-item" href="{% url 'login' %}">Home <span class="sr-only">(current)</span></a>      
+                       <a class="dropdown-item" href="/api">API <span class="sr-only">(current)</span></a>      
+                  </div>
+               </li>
+               {% else %}
+               <li class="nav-item">
+                   <a class="nav-link pull-right" href="{% url 'login' %}">Login <span class="sr-only">(current)</span></a>
+               </li>
+               {% endif %}
+               {% if request.user.is_authenticated %}
+                   {% if unread_count %}
+                   <li class="nav-item">
+                       <a href="/notifications"><i style="margin-top:10px" class="fa fa-bell"></i></a>
+                   </li>
+                   {% endif %}
+               {% endif %}
+           </ul>
+    </nav>
+</div>    
+    </header>
+{% endblock %}
