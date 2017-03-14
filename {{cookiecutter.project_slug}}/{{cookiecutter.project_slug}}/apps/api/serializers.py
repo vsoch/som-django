@@ -1,17 +1,5 @@
 from django.contrib.auth.models import User
-from {{cookiecutter.project_slug}}.apps.main.models import (
-    ImageAnnotation,
-    TextAnnotation,
-    ImageMarkup,
-    TextMarkup,
-    TextDescription,
-    ImageDescription,
-    Annotation,
-    Collection,
-    Entity,
-    Image,
-    Text
-)
+from {{cookiecutter.project_slug}}.apps.main.models import *
 
 from rest_framework import serializers
 

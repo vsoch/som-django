@@ -5,7 +5,7 @@ This is a [cookiecutter](https://github.com/audreyr/cookiecutter) template for D
 * If you have problems with the template, please open [issues](https://www.github.com/vsoch/som-django/issues).
 
 
-## Usage
+## Skeleton Generation
 The generation of your application base is done via a docker image, and will go into a folder that you map as a volume. Thus, you would want to clone this repo:
 
 
@@ -29,3 +29,16 @@ Once you are ready to generate your application, run the image, make an output f
 
 
 The resulting application will then be found in `/tmp/build`.
+
+
+## Application starting
+Let's first go to our build location, and generate the main image.
+
+      cd /tmp/build
+
+This is where you should also set up a github repo (or other version control) for your application. Next, build the image. It will correspond to the name of the application folder. Eg, `somdb` --> `vanessa/somdb`
+
+
+      docker build -t vanessa/somdb .
+
+You can change any and all names of your docker images in the `docker-compose.yml`.

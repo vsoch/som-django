@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     '{{cookiecutter.project_slug}}.apps.main',
     '{{cookiecutter.project_slug}}.apps.api',
     '{{cookiecutter.project_slug}}.apps.users',
-    '{{cookiecutter.project_slug}}.apps.snacks',
     '{{cookiecutter.project_slug}}.apps.storage',
 ]
 

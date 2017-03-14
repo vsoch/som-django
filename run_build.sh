@@ -7,3 +7,5 @@ rm /build/run_build.sh
 rm /build/Dockerfile
 rm /build/cookiecutter.json
 rm /build/LICENSE
+#TODO: generate secret key here
+chmod -R 777 /build

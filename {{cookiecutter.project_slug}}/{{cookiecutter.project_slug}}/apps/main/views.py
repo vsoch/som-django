@@ -11,26 +11,9 @@ from {{cookiecutter.project_slug}}.apps.main.stats import (
     count_task_annotations
 )
 
-from {{cookiecutter.project_slug}}.apps.main.utils import (
-    filter_collection_start,
-    get_annotations,
-    get_collection,
-    get_entity,
-    get_image_base,
-    get_image_basepath,
-    get_user_description,
-    get_user_markup,
-    has_image_base,
-    save_markup,
-    sniff_template_extension
-)
+from {{cookiecutter.project_slug}}.apps.main.utils import *
 
-from {{cookiecutter.project_slug}}.apps.main.navigation import (
-    get_next_to_markup,
-    get_next_to_describe,
-    get_next_to_annotate
-)
-
+from {{cookiecutter.project_slug}}.apps.main.navigation import *
 from {{cookiecutter.project_slug}}.settings import (
     BASE_DIR, 
     MEDIA_ROOT

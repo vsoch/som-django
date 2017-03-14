@@ -14,20 +14,7 @@ from django.contrib.auth.decorators import login_required
 import hashlib
 
 from {{cookiecutter.project_slug}}.settings import API_VERSION as APIVERSION
-from {{cookiecutter.project_slug}}.apps.main.models import (
-    Annotation,
-    Entity,
-    ImageDescription,
-    ImageAnnotation,
-    ImageMarkup,
-    Image, 
-    Collection,
-    TextAnnotation,
-    TextDescription,
-    TextMarkup,
-    Text
-)
-
+from {{cookiecutter.project_slug}}.apps.main.models import *
 from rest_framework import (
     viewsets, 
     generics
@@ -36,22 +23,8 @@ from rest_framework import (
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from {{cookiecutter.project_slug}}.apps.api.serializers import ( 
-    AnnotationSerializer,
-    CollectionSerializer,
-    EntitySerializer,
-    ImageSerializer,
-    TextSerializer,
-    TextAnnotationSerializer,
-    ImageAnnotationSerializer,
-    ImageMarkupSerializer,
-    TextMarkupSerializer,
-    ImageDescriptionSerializer,
-    TextDescriptionSerializer
-)
-
+from {{cookiecutter.project_slug}}.apps.api.serializers import *
 from {{cookiecutter.project_slug}}.apps.api.utils import chooseJsonResponse
-
 from django.contrib.auth.models import User
 
 
