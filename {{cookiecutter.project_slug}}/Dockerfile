@@ -4,10 +4,14 @@ RUN apt-get update && apt-get install -y \
     libopenblas-dev \
     gfortran \
     libhdf5-dev \
+    pkg-config \
+    libxmlsec1-dev \
+    libhdf5-dev \
     libgeos-dev \
     build-essential \
     openssl \
     nginx \
+    vim \
     wget
 
 RUN pip install --upgrade pip
@@ -18,7 +22,8 @@ RUN pip install numpy
 RUN pip install scikit-learn pandas h5py matplotlib
 RUN pip install uwsgi
 RUN pip install 'Django==1.10.2'
-RUN pip install python-social-auth
+RUN pip install social-auth-app-django
+RUN pip install social-auth-core[saml]
 RUN pip install djangorestframework
 RUN pip install django-rest-swagger
 RUN pip install markdown
@@ -55,7 +60,6 @@ RUN pip install django-oauth-toolkit
 RUN pip install simplejson
 RUN pip install django-gravatar2
 RUN pip install pygments
-RUN pip install social-auth-app-django
 RUN pip install django-notifications-hq
 RUN pip install social-auth-app-django
 RUN pip install som

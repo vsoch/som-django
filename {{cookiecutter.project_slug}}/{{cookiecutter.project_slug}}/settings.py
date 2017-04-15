@@ -39,15 +39,13 @@ INSTALLED_APPS = [
     '{{cookiecutter.project_slug}}.apps.main',
     '{{cookiecutter.project_slug}}.apps.api',
     '{{cookiecutter.project_slug}}.apps.users',
-    '{{cookiecutter.project_slug}}.apps.storage',
+    '{{cookiecutter.project_slug}}.apps.storage'
 ]
 
 THIRD_PARTY_APPS = [
     'social_django',
     'crispy_forms',
-    {% if cookiecutter.use_opbeat.lower() == 'y' -%}
     'opbeat.contrib.django',
-    {% endif %}
     'djcelery',
     'rest_framework',
     'rest_framework.authtoken',
@@ -55,7 +53,7 @@ THIRD_PARTY_APPS = [
     'guardian',
     'django_gravatar',
     'taggit',
-    'notifications',
+    'notifications'
 ]
 
 

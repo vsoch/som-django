@@ -5,16 +5,16 @@
 {% block content %}
 <div class="row">
     <div class="col-md-12" style="line-height:1.5em">
-        <h2>What is it?</h2>
-        <p>In a sea of things that need annotation, you would be lucky to find a Wordfish. Wordfish is exactly that: an annotation tool for experts to label things. It is an effort toward collaborative annotation to produce publicly available datasets for research. Wordfish will (eventually) allow for a combination of human- and algorithm- derived annotations of reports. This work is being done by the <a href="http://langlotzlab.stanford.edu" target="_blank">Langlotzlab</a> at Stanford University.</p><br>
+        <h2>Bone Age Prediction</h2>
+        <p>We can predict bone age from a radiograph! This work is being done by the <a href="http://langlotzlab.stanford.edu" target="_blank">Langlotzlab</a> at Stanford University.</p><br>
     </div>
 </div>
 <div class="row">
-    <div class="col-md-4" style="padding:50px;line-height:1.5em">
-        <a href="{% url 'collections' %}"><button class="btn btn-primary" type="button">Browse Collections</button></a>
+    <div class="col-md-4" style="padding-top:50px;line-height:1.5em">
+        <a href="{% url 'make_prediction' %}"><button class="btn btn-primary" type="button">Make a Prediction</button></a>
     </div>
     <div class="col-md-8" style="padding:50px;line-height:1.5em">
-        <img style="float:right;margin-right:50px" src="{% static 'img/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}.png' %}"/>
+        <img style="float:right;margin-right:50px" src="{% static 'img/wordfish/wordfish.png' %}"/>
     </div>
 </div>
 

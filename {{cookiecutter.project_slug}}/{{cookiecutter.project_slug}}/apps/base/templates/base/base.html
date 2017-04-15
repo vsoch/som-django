@@ -55,14 +55,9 @@
     <div class="row" style='padding-top:50px'>
 
             <!--Sidebar-->
-            {% if nosidebar %}
-               <div class="col-md-12" style="margin-top:20px">
-            {% else %}
-               {% include "base/sidebar.html" %}
-               <div class="col-md-9" style="margin-top:20px; padding:30px">
-            {% endif %}
+               <div class="col-md-12" style="margin-top:20px; padding:30px">
                 {% block content %}{% endblock %}
-             </div>
+               </div>
      </div>
 </div>
 
@@ -81,7 +76,6 @@ $(document).ready(function(){
 
    // If the user has snacks, alert to request a snack!
    {% if request.user.is_authenticated %} 
-       {% if user.snackbox_set.all.0.earned_snack %}  
 
        toastr.options = {
           "closeButton": true,
@@ -92,7 +86,7 @@ $(document).ready(function(){
           "preventDuplicates": true,
           "showDuration": "300",
           "hideDuration": "1000",
-          "onclick": function(){ document.location = "{% url 'redeem_snacks' %}" }
+          "onclick": function(){ document.location = "#" }
           "timeOut": "5000",
           "extendedTimeOut": "1000",
           "showEasing": "swing",
@@ -104,7 +98,6 @@ $(document).ready(function(){
        toastr["info"]("You have earned at least 1000 points in your SnackBox, 
                        and it's time to request a snack.", "You can request a snack!")
        {% endif %}
-   {% endif %}
 })
 </script>
     {% block scripts %}{% endblock %}
